@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from 'react';
-import { Fish, Thermometer, Wifi, WifiOff, Monitor, Clock, Zap, Camera, Plus } from 'lucide-react';
+import { Fish, Thermometer, Wifi, WifiOff, Monitor, Clock, Zap, Camera, Plus, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Link } from 'react-router-dom';
 
 interface TemperatureData {
   sensor1: number;
@@ -28,8 +30,17 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
+
+  const convertTemperature = (temp: number) => {
+    if (temperatureUnit === 'F') {
+      return (temp * 9/5) + 32;
+    }
+    return temp;
+  };
 
   const getTemperatureStatus = (temp: number) => {
+    // Use Celsius thresholds regardless of display unit
     if (temp < 24) return { status: 'cold', color: 'temp-cold', label: 'Too Cold' };
     if (temp > 28) return { status: 'hot', color: 'temp-hot', label: 'Too Hot' };
     return { status: 'good', color: 'temp-good', label: 'Optimal' };
@@ -109,6 +120,13 @@ const Index = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              <Link to="/settings">
+                <Button variant="outline" size="sm" className="flex items-center space-x-2">
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline">Settings</span>
+                </Button>
+              </Link>
+
               <Badge 
                 variant={systemHealth.apiStatus === 'online' ? 'default' : 'destructive'}
                 className={`${systemHealth.apiStatus === 'online' ? 'status-live' : 'status-offline'} text-white`}
@@ -135,49 +153,21 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {/* Temperature Readings Card */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600 lg:col-span-2">
+          {/* Camera Feed - Above Temperature */}
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600 lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-                <Thermometer className="w-5 h-5 text-blue-500" />
-                <span>Temperature Readings</span>
+                <Camera className="w-5 h-5 text-orange-500" />
+                <span>Live Camera Feed</span>
               </CardTitle>
-              <Badge variant="outline" className="text-xs">°C</Badge>
+              <Badge variant="outline" className="text-xs">HD</Badge>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Sensor 1 */}
-                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-slate-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 1</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {temperatureData?.sensor1.toFixed(1)}°
-                  </p>
-                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor1 || 0).color}`}>
-                    {getTemperatureStatus(temperatureData?.sensor1 || 0).label}
-                  </div>
-                </div>
-
-                {/* Sensor 2 */}
-                <div className="text-center p-4 rounded-lg bg-cyan-50 dark:bg-slate-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 2</p>
-                  <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-                    {temperatureData?.sensor2.toFixed(1)}°
-                  </p>
-                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor2 || 0).color}`}>
-                    {getTemperatureStatus(temperatureData?.sensor2 || 0).label}
-                  </div>
-                </div>
-
-                {/* Average Temperature */}
-                <div className={`text-center p-4 rounded-lg border-2 ${avgTempStatus.color} aqua-glow`}>
-                  <p className="text-sm font-medium mb-1">Average</p>
-                  <p className="text-3xl font-bold">
-                    {avgTemp.toFixed(1)}°
-                  </p>
-                  <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 bg-white/50 dark:bg-slate-800/50">
-                    {avgTempStatus.label}
-                  </div>
-                </div>
+            <CardContent className="flex flex-col items-center justify-center h-64 text-center">
+              <Camera className="w-20 h-20 text-orange-500 mb-4" />
+              <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 text-xl">Live Video Stream</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Camera feed will appear here when connected</p>
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-lg h-20 flex items-center justify-center">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Video placeholder</span>
               </div>
             </CardContent>
           </Card>
@@ -219,21 +209,49 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Camera Feed - Now Larger */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600 lg:col-span-2">
+          {/* Temperature Readings Card - Now Below Camera */}
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600 lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-                <Camera className="w-5 h-5 text-orange-500" />
-                <span>Live Camera Feed</span>
+                <Thermometer className="w-5 h-5 text-blue-500" />
+                <span>Temperature Readings</span>
               </CardTitle>
-              <Badge variant="outline" className="text-xs">HD</Badge>
+              <Badge variant="outline" className="text-xs">°{temperatureUnit}</Badge>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center h-64 text-center">
-              <Camera className="w-20 h-20 text-orange-500 mb-4" />
-              <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 text-xl">Live Video Stream</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Camera feed will appear here when connected</p>
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-lg h-20 flex items-center justify-center">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Video placeholder</span>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Sensor 1 */}
+                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-slate-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 1</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {convertTemperature(temperatureData?.sensor1 || 0).toFixed(1)}°
+                  </p>
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor1 || 0).color}`}>
+                    {getTemperatureStatus(temperatureData?.sensor1 || 0).label}
+                  </div>
+                </div>
+
+                {/* Sensor 2 */}
+                <div className="text-center p-4 rounded-lg bg-cyan-50 dark:bg-slate-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 2</p>
+                  <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                    {convertTemperature(temperatureData?.sensor2 || 0).toFixed(1)}°
+                  </p>
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor2 || 0).color}`}>
+                    {getTemperatureStatus(temperatureData?.sensor2 || 0).label}
+                  </div>
+                </div>
+
+                {/* Average Temperature */}
+                <div className={`text-center p-4 rounded-lg border-2 ${avgTempStatus.color} aqua-glow`}>
+                  <p className="text-sm font-medium mb-1">Average</p>
+                  <p className="text-3xl font-bold">
+                    {convertTemperature(avgTemp).toFixed(1)}°
+                  </p>
+                  <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 bg-white/50 dark:bg-slate-800/50">
+                    {avgTempStatus.label}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
