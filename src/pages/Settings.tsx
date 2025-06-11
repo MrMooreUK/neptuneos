@@ -1,4 +1,3 @@
-
 import { ArrowLeft, Thermometer, Monitor, Wifi, HardDrive, RotateCcw, Power, Download, Upload, Palette } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -62,17 +61,11 @@ const Settings = () => {
                   Back to Dashboard
                 </Button>
               </Link>
-              <div className="p-2 bg-blue-500 rounded-xl">
-                <img 
-                  src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
-                  alt="NeptuneOS Logo"
-                  className="w-8 h-8"
-                />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Settings</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">System Configuration</p>
-              </div>
+              <img 
+                src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+                alt="NeptuneOS Logo"
+                className="w-12 h-12"
+              />
             </div>
             
             <Badge variant="outline" className="text-xs">NeptuneOS v1.0</Badge>
