@@ -4,8 +4,9 @@ import { Fish, Thermometer, Wifi, WifiOff, Monitor, Clock, Zap, Camera, Plus, Se
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Link } from 'react-router-dom';
+import { useSettings } from '@/contexts/SettingsContext';
+import { convertTemperature, getTemperatureStatus } from '@/utils/temperature';
 
 interface TemperatureData {
   sensor1: number;
@@ -29,22 +30,8 @@ const Index = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
-
-  const convertTemperature = (temp: number) => {
-    if (temperatureUnit === 'F') {
-      return (temp * 9/5) + 32;
-    }
-    return temp;
-  };
-
-  const getTemperatureStatus = (temp: number) => {
-    // Use Celsius thresholds regardless of display unit
-    if (temp < 24) return { status: 'cold', color: 'temp-cold', label: 'Too Cold' };
-    if (temp > 28) return { status: 'hot', color: 'temp-hot', label: 'Too Hot' };
-    return { status: 'good', color: 'temp-good', label: 'Optimal' };
-  };
+  
+  const { temperatureUnit, refreshInterval, autoRefresh } = useSettings();
 
   const fetchTemperatureData = async () => {
     try {
@@ -76,17 +63,11 @@ const Index = () => {
 
   useEffect(() => {
     fetchTemperatureData();
-    const interval = setInterval(fetchTemperatureData, 10000); // Auto-refresh every 10 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    if (autoRefresh) {
+      const interval = setInterval(fetchTemperatureData, refreshInterval * 1000);
+      return () => clearInterval(interval);
     }
-  }, [isDarkMode]);
+  }, [refreshInterval, autoRefresh]);
 
   if (isLoading) {
     return (
@@ -224,7 +205,7 @@ const Index = () => {
                 <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-slate-700">
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 1</p>
                   <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {convertTemperature(temperatureData?.sensor1 || 0).toFixed(1)}°
+                    {convertTemperature(temperatureData?.sensor1 || 0, temperatureUnit).toFixed(1)}°
                   </p>
                   <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor1 || 0).color}`}>
                     {getTemperatureStatus(temperatureData?.sensor1 || 0).label}
@@ -235,7 +216,7 @@ const Index = () => {
                 <div className="text-center p-4 rounded-lg bg-cyan-50 dark:bg-slate-700">
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 2</p>
                   <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-                    {convertTemperature(temperatureData?.sensor2 || 0).toFixed(1)}°
+                    {convertTemperature(temperatureData?.sensor2 || 0, temperatureUnit).toFixed(1)}°
                   </p>
                   <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor2 || 0).color}`}>
                     {getTemperatureStatus(temperatureData?.sensor2 || 0).label}
@@ -246,7 +227,7 @@ const Index = () => {
                 <div className={`text-center p-4 rounded-lg border-2 ${avgTempStatus.color} aqua-glow`}>
                   <p className="text-sm font-medium mb-1">Average</p>
                   <p className="text-3xl font-bold">
-                    {convertTemperature(avgTemp).toFixed(1)}°
+                    {convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°
                   </p>
                   <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 bg-white/50 dark:bg-slate-800/50">
                     {avgTempStatus.label}
@@ -268,29 +249,11 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Simplified Footer */}
       <footer className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-t border-blue-100 dark:border-slate-700 mt-12">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Dark Mode</span>
-                <Switch 
-                  checked={isDarkMode} 
-                  onCheckedChange={setIsDarkMode}
-                />
-              </div>
-              <Badge variant="outline" className="text-xs">v1.0</Badge>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" disabled>
-                Reboot Pi
-              </Button>
-              <Button variant="outline" size="sm" disabled>
-                Reset Settings
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0">
+            <Badge variant="outline" className="text-xs">NeptuneOS v1.0</Badge>
           </div>
         </div>
       </footer>

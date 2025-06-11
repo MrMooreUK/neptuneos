@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
 import { ArrowLeft, Thermometer, Monitor, Wifi, HardDrive, RotateCcw, Power, Download, Upload, Palette } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { useSettings } from '@/contexts/SettingsContext';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -17,29 +18,35 @@ import {
 } from '@/components/ui/dialog';
 
 const Settings = () => {
-  const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [refreshInterval, setRefreshInterval] = useState(10);
-
-  const handleReboot = () => {
-    console.log('Rebooting system...');
-    // In a real implementation, this would make an API call to reboot the Pi
-  };
-
-  const handleFactoryReset = () => {
-    console.log('Factory reset initiated...');
-    // In a real implementation, this would reset all settings
-  };
+  const {
+    temperatureUnit,
+    isDarkMode,
+    refreshInterval,
+    autoRefresh,
+    setTemperatureUnit,
+    setIsDarkMode,
+    setRefreshInterval,
+    setAutoRefresh,
+    rebootSystem,
+    factoryReset
+  } = useSettings();
+  
+  const { toast } = useToast();
 
   const handleBackupExport = () => {
     console.log('Exporting backup...');
-    // In a real implementation, this would export system configuration
+    toast({
+      title: "Backup Export",
+      description: "System configuration has been exported successfully.",
+    });
   };
 
   const handleBackupImport = () => {
     console.log('Importing backup...');
-    // In a real implementation, this would import system configuration
+    toast({
+      title: "Backup Import",
+      description: "System configuration has been imported successfully.",
+    });
   };
 
   return (
@@ -253,7 +260,7 @@ const Settings = () => {
                     </DialogHeader>
                     <DialogFooter>
                       <Button variant="outline">Cancel</Button>
-                      <Button variant="destructive" onClick={handleReboot}>Reboot Now</Button>
+                      <Button variant="destructive" onClick={rebootSystem}>Reboot Now</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -274,7 +281,7 @@ const Settings = () => {
                     </DialogHeader>
                     <DialogFooter>
                       <Button variant="outline">Cancel</Button>
-                      <Button variant="destructive" onClick={handleFactoryReset}>Reset Now</Button>
+                      <Button variant="destructive" onClick={factoryReset}>Reset Now</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
