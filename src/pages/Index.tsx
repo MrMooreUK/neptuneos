@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSettings } from '@/contexts/SettingsContext';
+import { logSecurityEvent, defaultSecurityConfig } from '@/config/security';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import LoadingScreen from '@/components/dashboard/LoadingScreen';
 import StatusOverviewGrid from '@/components/dashboard/StatusOverviewGrid';
@@ -25,14 +26,26 @@ const Index = () => {
 
   const fetchTemperatureData = async () => {
     try {
-      const response = await fetch('/api/temperature');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), defaultSecurityConfig.connectionTimeout);
+      
+      const response = await fetch(defaultSecurityConfig.apiBaseUrl + '/temperature', {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
         setTemperatureData(data);
+        logSecurityEvent('Temperature data fetched successfully');
       } else {
-        throw new Error('API unavailable');
+        throw new Error(`API responded with status: ${response.status}`);
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logSecurityEvent('API request failed, using mock data', { error: errorMessage });
+      
       console.log('Using mock data - API not available');
       const mockData: TemperatureData = {
         sensor1: 25.8,
@@ -48,6 +61,7 @@ const Index = () => {
   };
 
   useEffect(() => {
+    logSecurityEvent('Dashboard initialized');
     fetchTemperatureData();
     if (autoRefresh) {
       const interval = setInterval(fetchTemperatureData, refreshInterval * 1000);
