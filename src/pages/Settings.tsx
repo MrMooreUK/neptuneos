@@ -1,4 +1,3 @@
-
 import { ArrowLeft, Thermometer, Monitor, Wifi, HardDrive, RotateCcw, Power, Download, Upload, Palette } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -87,17 +86,17 @@ const Settings = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1 pr-4">
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">Temperature Unit</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Choose between Celsius and Fahrenheit</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`text-sm ${temperatureUnit === 'C' ? 'font-semibold text-blue-600' : 'text-gray-500'}`}>°C</span>
+                <div className="flex items-center space-x-3 min-w-fit">
+                  <span className={`text-sm font-medium min-w-[24px] text-center ${temperatureUnit === 'C' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°C</span>
                   <Switch 
                     checked={temperatureUnit === 'F'} 
                     onCheckedChange={(checked) => setTemperatureUnit(checked ? 'F' : 'C')}
                   />
-                  <span className={`text-sm ${temperatureUnit === 'F' ? 'font-semibold text-blue-600' : 'text-gray-500'}`}>°F</span>
+                  <span className={`text-sm font-medium min-w-[24px] text-center ${temperatureUnit === 'F' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°F</span>
                 </div>
               </div>
 
