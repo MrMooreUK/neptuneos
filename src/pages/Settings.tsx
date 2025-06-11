@@ -62,9 +62,9 @@ const Settings = () => {
                 </Button>
               </Link>
               <img 
-                src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+                src="/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"
                 alt="NeptuneOS Logo"
-                className="w-12 h-12"
+                className="w-20 h-20"
               />
             </div>
             
@@ -296,3 +296,5 @@ const Settings = () => {
 };
 
 export default Settings;
+
+</edits_to_apply>

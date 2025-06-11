@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,9 +82,9 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img 
-                src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+                src="/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"
                 alt="NeptuneOS Logo"
-                className="w-12 h-12"
+                className="w-20 h-20"
               />
             </div>
             
