@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,19 +15,8 @@ interface TemperatureData {
   timestamp: string;
 }
 
-interface SystemHealth {
-  uptime: string;
-  apiStatus: 'online' | 'offline';
-  ipAddress: string;
-}
-
 const Index = () => {
   const [temperatureData, setTemperatureData] = useState<TemperatureData | null>(null);
-  const [systemHealth, setSystemHealth] = useState<SystemHealth>({
-    uptime: '2d 14h 32m',
-    apiStatus: 'online',
-    ipAddress: '192.168.1.42'
-  });
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   
@@ -39,7 +29,6 @@ const Index = () => {
       if (response.ok) {
         const data = await response.json();
         setTemperatureData(data);
-        setSystemHealth(prev => ({ ...prev, apiStatus: 'online' }));
       } else {
         throw new Error('API unavailable');
       }
@@ -53,7 +42,6 @@ const Index = () => {
         timestamp: new Date().toISOString()
       };
       setTemperatureData(mockData);
-      setSystemHealth(prev => ({ ...prev, apiStatus: 'offline' }));
     } finally {
       setIsLoading(false);
       setLastUpdated(new Date());
@@ -106,17 +94,6 @@ const Index = () => {
                   <span className="hidden sm:inline">Settings</span>
                 </Button>
               </Link>
-
-              <Badge 
-                variant={systemHealth.apiStatus === 'online' ? 'default' : 'destructive'}
-                className={`${systemHealth.apiStatus === 'online' ? 'status-live' : 'status-offline'} text-white`}
-              >
-                {systemHealth.apiStatus === 'online' ? (
-                  <><Wifi className="w-3 h-3 mr-1" /> Live</>
-                ) : (
-                  <><WifiOff className="w-3 h-3 mr-1" /> Offline</>
-                )}
-              </Badge>
               
               <div className="text-right hidden sm:block">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Last Updated</p>
@@ -131,10 +108,10 @@ const Index = () => {
 
       {/* Main Dashboard */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Camera Feed */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600 lg:col-span-2">
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
                 <Camera className="w-5 h-5 text-orange-500" />
@@ -152,18 +129,8 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Locked Add-ons */}
-          <Card className="card-hover bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 border-gray-300 dark:border-slate-500 opacity-75">
-            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
-              <Lock className="w-12 h-12 text-gray-500 dark:text-gray-400 mb-3" />
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Features Locked</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Lighting • Filtration • Feeding</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Coming Soon</p>
-            </CardContent>
-          </Card>
-
           {/* Temperature Readings Card */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600 lg:col-span-3">
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
                 <Thermometer className="w-5 h-5 text-blue-500" />
@@ -209,6 +176,18 @@ const Index = () => {
             </CardContent>
           </Card>
 
+        </div>
+
+        {/* Locked Add-ons at Bottom */}
+        <div className="mt-8">
+          <Card className="card-hover bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 border-gray-300 dark:border-slate-500 opacity-75">
+            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
+              <Lock className="w-12 h-12 text-gray-500 dark:text-gray-400 mb-3" />
+              <h3 className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Features Locked</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Lighting • Filtration • Feeding</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Coming Soon</p>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
