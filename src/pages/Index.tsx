@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Monitor, Clock, Zap, Camera, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -220,23 +219,22 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* pH Level Placeholder */}
-          <Card className="card-hover bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-dashed border-2 border-purple-300 dark:border-purple-600">
-            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-3">
-                <span className="text-xl">📊</span>
+          {/* Camera Feed - Now Larger */}
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600 lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center space-x-2">
+                <Camera className="w-5 h-5 text-orange-500" />
+                <span>Live Camera Feed</span>
+              </CardTitle>
+              <Badge variant="outline" className="text-xs">HD</Badge>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center h-64 text-center">
+              <Camera className="w-20 h-20 text-orange-500 mb-4" />
+              <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 text-xl">Live Video Stream</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Camera feed will appear here when connected</p>
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-lg h-20 flex items-center justify-center">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Video placeholder</span>
               </div>
-              <h3 className="font-semibold text-purple-600 dark:text-purple-400 mb-1">pH Level Monitor</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Coming Soon</p>
-            </CardContent>
-          </Card>
-
-          {/* Camera Feed Placeholder */}
-          <Card className="card-hover bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-dashed border-2 border-orange-300 dark:border-orange-600">
-            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
-              <Camera className="w-12 h-12 text-orange-500 mb-3" />
-              <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-1">Live Camera Feed</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Video stream placeholder</p>
             </CardContent>
           </Card>
 
