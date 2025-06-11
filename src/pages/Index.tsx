@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Fish, Thermometer, Wifi, WifiOff, Monitor, Clock, Zap, Camera, Plus, Settings } from 'lucide-react';
+import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -134,7 +133,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {/* Camera Feed - Above Temperature */}
+          {/* Camera Feed */}
           <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600 lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
@@ -153,45 +152,18 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* System Health Card */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-green-200 dark:border-slate-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-                <Monitor className="w-5 h-5 text-green-500" />
-                <span>System Health</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Uptime</span>
-                </div>
-                <span className="font-medium text-green-600 dark:text-green-400">{systemHealth.uptime}</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">API Status</span>
-                </div>
-                <Badge variant={systemHealth.apiStatus === 'online' ? 'default' : 'destructive'}>
-                  {systemHealth.apiStatus}
-                </Badge>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Wifi className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">IP Address</span>
-                </div>
-                <span className="font-mono text-sm text-blue-600 dark:text-blue-400">{systemHealth.ipAddress}</span>
-              </div>
+          {/* Locked Add-ons */}
+          <Card className="card-hover bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 border-gray-300 dark:border-slate-500 opacity-75">
+            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
+              <Lock className="w-12 h-12 text-gray-500 dark:text-gray-400 mb-3" />
+              <h3 className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Features Locked</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Lighting • Filtration • Feeding</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Coming Soon</p>
             </CardContent>
           </Card>
 
-          {/* Temperature Readings Card - Now Below Camera */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600 lg:col-span-2">
+          {/* Temperature Readings Card */}
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600 lg:col-span-3">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-lg font-semibold flex items-center space-x-2">
                 <Thermometer className="w-5 h-5 text-blue-500" />
@@ -234,15 +206,6 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Add-ons Coming Soon */}
-          <Card className="card-hover bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-slate-700 dark:to-slate-600 border-cyan-300 dark:border-slate-500">
-            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
-              <Plus className="w-12 h-12 text-cyan-600 dark:text-cyan-400 mb-3 pulse-slow" />
-              <h3 className="font-semibold text-cyan-700 dark:text-cyan-300 mb-1">Add-ons Coming Soon</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Lighting • Filtration • Feeding</p>
             </CardContent>
           </Card>
 
