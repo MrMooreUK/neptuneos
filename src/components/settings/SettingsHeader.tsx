@@ -19,7 +19,7 @@ const SettingsHeader = () => {
             <img 
               src="/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"
               alt="NeptuneOS Logo"
-              className="w-20 h-20"
+              className="w-40 h-40"
             />
           </div>
           

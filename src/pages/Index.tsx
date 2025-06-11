@@ -62,7 +62,7 @@ const Index = () => {
           <img 
             src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
             alt="NeptuneOS Logo"
-            className="w-16 h-16 mx-auto mb-4 wave-animation"
+            className="w-32 h-32 mx-auto mb-4 wave-animation"
           />
           <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading NeptuneOS</h2>
           <p className="text-gray-500 dark:text-gray-400">Connecting to aquarium sensors...</p>
@@ -84,7 +84,7 @@ const Index = () => {
               <img 
                 src="/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"
                 alt="NeptuneOS Logo"
-                className="w-20 h-20"
+                className="w-40 h-40"
               />
             </div>
             
