@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
+import { Fish, Thermometer, Camera, Lock, Settings, RefreshCw, Activity, Wifi } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ const Index = () => {
 
   const fetchTemperatureData = async () => {
     try {
-      // Mock API call - replace with actual endpoint
       const response = await fetch('/api/temperature');
       if (response.ok) {
         const data = await response.json();
@@ -34,7 +33,6 @@ const Index = () => {
       }
     } catch (error) {
       console.log('Using mock data - API not available');
-      // Mock data for demonstration
       const mockData: TemperatureData = {
         sensor1: 25.8,
         sensor2: 26.2,
@@ -75,125 +73,204 @@ const Index = () => {
   const avgTempStatus = getTemperatureStatus(avgTemp);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-blue-900 transition-all duration-500">
-      {/* Header */}
-      <header className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md shadow-lg border-b border-blue-100 dark:border-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-blue-900">
+      {/* Modern Header */}
+      <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg shadow-sm border-b border-blue-200/50 dark:border-slate-700/50 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Fish className="w-8 h-8 text-blue-500 mr-3" />
+            <div className="flex items-center space-x-3">
+              <Fish className="w-8 h-8 text-blue-500" />
               <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">NeptuneOS</h1>
+              <Badge variant="outline" className="ml-2 text-xs">v1.0</Badge>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
+                <Activity className="w-4 h-4 text-green-500" />
+                <span className="hidden sm:inline">System Online</span>
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={fetchTemperatureData}
+                className="p-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+              
               <Link to="/settings">
                 <Button variant="outline" size="sm" className="flex items-center space-x-2">
                   <Settings className="w-4 h-4" />
                   <span className="hidden sm:inline">Settings</span>
                 </Button>
               </Link>
-              
-              <div className="text-right hidden sm:block">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Last Updated</p>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {lastUpdated.toLocaleTimeString()}
-                </p>
-              </div>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Dashboard */}
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Camera Feed */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-300 dark:border-orange-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-                <Camera className="w-5 h-5 text-orange-500" />
-                <span>Live Camera Feed</span>
-              </CardTitle>
-              <Badge variant="outline" className="text-xs">HD</Badge>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center h-64 text-center">
-              <Camera className="w-20 h-20 text-orange-500 mb-4" />
-              <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 text-xl">Live Video Stream</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Camera feed will appear here when connected</p>
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-lg h-20 flex items-center justify-center">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Video placeholder</span>
+      <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Status Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">System Status</p>
+                  <p className="text-lg font-semibold text-green-600 dark:text-green-400">Online</p>
+                </div>
+                <Wifi className="w-8 h-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Temperature Readings Card */}
-          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-                <Thermometer className="w-5 h-5 text-blue-500" />
-                <span>Temperature Readings</span>
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Average Temp</p>
+                  <p className="text-lg font-semibold">
+                    {convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°{temperatureUnit}
+                  </p>
+                </div>
+                <div className={`inline-block px-2 py-1 rounded-full text-xs ${avgTempStatus.color}`}>
+                  {avgTempStatus.label}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Last Updated</p>
+                  <p className="text-lg font-semibold">
+                    {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+                <RefreshCw className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Sensors Active</p>
+                  <p className="text-lg font-semibold">2/2</p>
+                </div>
+                <Activity className="w-8 h-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          
+          {/* Temperature Monitoring - Takes 2 columns on XL screens */}
+          <Card className="xl:col-span-2 card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-blue-200 dark:border-slate-600">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-semibold flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Thermometer className="w-6 h-6 text-blue-500" />
+                  <span>Temperature Monitoring</span>
+                </div>
+                <Badge variant="outline" className="text-xs">°{temperatureUnit}</Badge>
               </CardTitle>
-              <Badge variant="outline" className="text-xs">°{temperatureUnit}</Badge>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Sensor 1 */}
-                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-slate-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 1</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <CardContent className="space-y-6">
+              {/* Temperature Overview */}
+              <div className={`text-center p-6 rounded-xl border-2 ${avgTempStatus.color} aqua-glow`}>
+                <p className="text-sm font-medium mb-2 opacity-80">Current Average Temperature</p>
+                <p className="text-4xl font-bold mb-2">
+                  {convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°
+                </p>
+                <div className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-white/50 dark:bg-slate-800/50">
+                  {avgTempStatus.label}
+                </div>
+              </div>
+
+              {/* Individual Sensors */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-slate-700 border border-blue-200 dark:border-slate-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Sensor 1 (Intake)</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                     {convertTemperature(temperatureData?.sensor1 || 0, temperatureUnit).toFixed(1)}°
                   </p>
-                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor1 || 0).color}`}>
+                  <div className={`inline-block px-3 py-1 rounded-full text-xs ${getTemperatureStatus(temperatureData?.sensor1 || 0).color}`}>
                     {getTemperatureStatus(temperatureData?.sensor1 || 0).label}
                   </div>
                 </div>
 
-                {/* Sensor 2 */}
-                <div className="text-center p-4 rounded-lg bg-cyan-50 dark:bg-slate-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Sensor 2</p>
-                  <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                <div className="text-center p-4 rounded-lg bg-cyan-50 dark:bg-slate-700 border border-cyan-200 dark:border-slate-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Sensor 2 (Output)</p>
+                  <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
                     {convertTemperature(temperatureData?.sensor2 || 0, temperatureUnit).toFixed(1)}°
                   </p>
-                  <div className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${getTemperatureStatus(temperatureData?.sensor2 || 0).color}`}>
+                  <div className={`inline-block px-3 py-1 rounded-full text-xs ${getTemperatureStatus(temperatureData?.sensor2 || 0).color}`}>
                     {getTemperatureStatus(temperatureData?.sensor2 || 0).label}
-                  </div>
-                </div>
-
-                {/* Average Temperature */}
-                <div className={`text-center p-4 rounded-lg border-2 ${avgTempStatus.color} aqua-glow`}>
-                  <p className="text-sm font-medium mb-1">Average</p>
-                  <p className="text-3xl font-bold">
-                    {convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°
-                  </p>
-                  <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 bg-white/50 dark:bg-slate-800/50">
-                    {avgTempStatus.label}
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-        </div>
-
-        {/* Locked Add-ons at Bottom */}
-        <div className="mt-8">
-          <Card className="card-hover bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 border-gray-300 dark:border-slate-500 opacity-75">
-            <CardContent className="flex flex-col items-center justify-center h-40 text-center">
-              <Lock className="w-12 h-12 text-gray-500 dark:text-gray-400 mb-3" />
-              <h3 className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Features Locked</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Lighting • Filtration • Feeding</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Coming Soon</p>
+          {/* Camera Feed */}
+          <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-orange-200 dark:border-orange-600">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-semibold flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Camera className="w-6 h-6 text-orange-500" />
+                  <span>Live Feed</span>
+                </div>
+                <Badge variant="outline" className="text-xs text-green-600">Live</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="aspect-video bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-slate-600">
+                <div className="text-center">
+                  <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Camera Initializing...</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>Resolution: 1080p</span>
+                <span>FPS: 30</span>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Coming Soon Features */}
+        <Card className="card-hover bg-gradient-to-r from-gray-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 border-gray-200 dark:border-slate-600">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Lock className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                <div>
+                  <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Advanced Features</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Automated feeding • Smart lighting • Water quality monitoring</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-xs">Coming Soon</Badge>
+            </div>
+          </CardContent>
+        </Card>
       </main>
 
-      {/* Simplified Footer */}
-      <footer className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-t border-blue-100 dark:border-slate-700 mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0">
-            <Badge variant="outline" className="text-xs">NeptuneOS v1.0</Badge>
+      {/* Clean Footer */}
+      <footer className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-t border-blue-100 dark:border-slate-700 mt-8">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              © 2024 NeptuneOS. Advanced Aquarium Monitoring System.
+            </p>
           </div>
         </div>
       </footer>
