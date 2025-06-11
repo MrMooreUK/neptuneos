@@ -189,11 +189,24 @@ const Index = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="aspect-video bg-gray-100 dark:bg-slate-700 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-slate-600">
-              <div className="text-center">
-                <Camera className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-                <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">Camera Initializing...</p>
-                <p className="text-sm text-gray-400 dark:text-gray-500">HD live feed will appear here</p>
+            <div className="aspect-video bg-gray-100 dark:bg-slate-700 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-slate-600">
+              <img 
+                src="http://192.168.10.148:5000/"
+                alt="Live Camera Feed"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+              <div className="w-full h-full flex items-center justify-center" style={{ display: 'none' }}>
+                <div className="text-center">
+                  <Camera className="w-16 h-16 text-gray-400 mx-auto mb-3" />
+                  <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">Camera Unavailable</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Check camera connection at 192.168.10.148:5000</p>
+                </div>
               </div>
             </div>
             
@@ -201,11 +214,10 @@ const Index = () => {
               <div className="flex items-center space-x-4">
                 <span className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>Resolution: 1080p</span>
+                  <span>Stream: 192.168.10.148:5000</span>
                 </span>
-                <span>FPS: 30</span>
               </div>
-              <span>Stream Quality: HD</span>
+              <span>Live Feed</span>
             </div>
           </CardContent>
         </Card>
