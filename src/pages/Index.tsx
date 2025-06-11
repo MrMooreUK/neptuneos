@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,7 +61,7 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
           <img 
-            src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+            src="/lovable-uploads/20e740fd-cf7b-478e-9814-75639d535576.png"
             alt="NeptuneOS Logo"
             className="w-32 h-32 mx-auto mb-4 wave-animation"
           />
@@ -82,7 +83,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img 
-                src="/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"
+                src="/lovable-uploads/20e740fd-cf7b-478e-9814-75639d535576.png"
                 alt="NeptuneOS Logo"
                 className="w-40 h-40"
               />
