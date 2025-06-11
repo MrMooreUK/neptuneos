@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +19,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   
-  const { temperatureUnit, refreshInterval, autoRefresh } = useSettings();
+  const { temperatureUnit, refreshInterval, autoRefresh, isDarkMode } = useSettings();
 
   const fetchTemperatureData = async () => {
     try {
@@ -60,7 +59,11 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
-          <Fish className="w-16 h-16 text-blue-500 mx-auto mb-4 wave-animation" />
+          <img 
+            src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+            alt="NeptuneOS Logo"
+            className="w-16 h-16 mx-auto mb-4 wave-animation"
+          />
           <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading NeptuneOS</h2>
           <p className="text-gray-500 dark:text-gray-400">Connecting to aquarium sensors...</p>
         </div>
@@ -79,7 +82,11 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-500 rounded-xl">
-                <Fish className="w-8 h-8 text-white" />
+                <img 
+                  src={isDarkMode ? "/lovable-uploads/e69a2f3e-bce9-40ec-b21b-0c4ee24adebd.png" : "/lovable-uploads/7a639741-946c-4ffe-83f1-6db4098f2d5b.png"}
+                  alt="NeptuneOS Logo"
+                  className="w-8 h-8"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">NeptuneOS</h1>
