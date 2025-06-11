@@ -1,5 +1,5 @@
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Fish } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -16,11 +16,7 @@ const SettingsHeader = () => {
                 Back to Dashboard
               </Button>
             </Link>
-            <img 
-              src="/lovable-uploads/20e740fd-cf7b-478e-9814-75639d535576.png"
-              alt="NeptuneOS Logo"
-              className="w-40 h-40"
-            />
+            <Fish className="w-40 h-40 text-blue-500" />
           </div>
           
           <Badge variant="outline" className="text-xs">NeptuneOS v1.0</Badge>
