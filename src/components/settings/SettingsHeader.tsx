@@ -16,7 +16,10 @@ const SettingsHeader = () => {
                 Back to Dashboard
               </Button>
             </Link>
-            <Fish className="w-40 h-40 text-blue-500" />
+            <div className="flex items-center">
+              <Fish className="w-8 h-8 text-blue-500 mr-3" />
+              <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">NeptuneOS</h1>
+            </div>
           </div>
           
           <Badge variant="outline" className="text-xs">NeptuneOS v1.0</Badge>

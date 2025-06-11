@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Fish, Thermometer, Wifi, WifiOff, Camera, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,7 +60,10 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
-          <Fish className="w-32 h-32 mx-auto mb-4 wave-animation text-blue-500" />
+          <div className="flex items-center justify-center mb-4">
+            <Fish className="w-12 h-12 wave-animation text-blue-500 mr-3" />
+            <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400">NeptuneOS</h1>
+          </div>
           <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading NeptuneOS</h2>
           <p className="text-gray-500 dark:text-gray-400">Connecting to aquarium sensors...</p>
         </div>
@@ -77,7 +81,8 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Fish className="w-40 h-40 text-blue-500" />
+              <Fish className="w-8 h-8 text-blue-500 mr-3" />
+              <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">NeptuneOS</h1>
             </div>
             
             <div className="flex items-center space-x-4">
