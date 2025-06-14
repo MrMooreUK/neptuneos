@@ -1,16 +1,9 @@
-
 import { Thermometer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/contexts/SettingsContext';
 import { convertTemperature, getTemperatureStatus } from '@/utils/temperature';
-
-interface TemperatureData {
-  sensor1: number;
-  sensor2: number;
-  average: number;
-  timestamp: string;
-}
+import { TemperatureData } from '@/hooks/useTemperatureData';
 
 interface TemperatureMonitoringProps {
   temperatureData: TemperatureData | null;
