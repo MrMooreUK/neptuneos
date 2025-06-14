@@ -1,16 +1,19 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security'; // Added validateNetworkEndpoint and defaultSecurityConfig
 
 interface SettingsContextType {
   temperatureUnit: 'C' | 'F';
   isDarkMode: boolean;
   refreshInterval: number;
   autoRefresh: boolean;
+  cameraStreamUrl: string; // Added
   setTemperatureUnit: (unit: 'C' | 'F') => void;
   setIsDarkMode: (isDark: boolean) => void;
   setRefreshInterval: (interval: number) => void;
   setAutoRefresh: (auto: boolean) => void;
+  setCameraStreamUrl: (url: string) => void; // Added
   rebootSystem: () => void;
   factoryReset: () => void;
 }
@@ -34,6 +37,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [isDarkMode, setIsDarkModeState] = useState(false);
   const [refreshInterval, setRefreshIntervalState] = useState(10);
   const [autoRefresh, setAutoRefreshState] = useState(true);
+  const [cameraStreamUrl, setCameraStreamUrlState] = useState<string>(defaultSecurityConfig.cameraStreamUrl); // Added state for cameraStreamUrl
   const { toast } = useToast();
 
   // Load settings from localStorage on mount
@@ -46,8 +50,11 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         setIsDarkModeState(settings.isDarkMode || false);
         setRefreshIntervalState(settings.refreshInterval || 10);
         setAutoRefreshState(settings.autoRefresh !== undefined ? settings.autoRefresh : true);
+        setCameraStreamUrlState(settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl); // Load cameraStreamUrl
       } catch (error) {
         console.log('Error loading settings from localStorage:', error);
+        // Fallback to defaults if parsing fails or specific keys are missing
+        setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl);
       }
     }
   }, []);
@@ -67,10 +74,11 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       temperatureUnit,
       isDarkMode,
       refreshInterval,
-      autoRefresh
+      autoRefresh,
+      cameraStreamUrl // Save cameraStreamUrl
     };
     localStorage.setItem('neptuneOS-settings', JSON.stringify(settings));
-  }, [temperatureUnit, isDarkMode, refreshInterval, autoRefresh]);
+  }, [temperatureUnit, isDarkMode, refreshInterval, autoRefresh, cameraStreamUrl]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setTemperatureUnitState(unit);
@@ -104,6 +112,22 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     });
   };
 
+  const setCameraStreamUrl = (url: string) => { // Added function to set cameraStreamUrl
+    if (validateNetworkEndpoint(url)) {
+      setCameraStreamUrlState(url);
+      toast({
+        title: "Camera Stream URL Updated",
+        description: `Camera stream URL configured.`,
+      });
+    } else {
+      toast({
+        title: "Invalid URL",
+        description: "The provided camera stream URL is not valid. It must be http or https.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const rebootSystem = () => {
     console.log('Rebooting system...');
     toast({
@@ -119,7 +143,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     setIsDarkModeState(false);
     setRefreshIntervalState(10);
     setAutoRefreshState(true);
-    localStorage.removeItem('neptuneOS-settings');
+    setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl); // Reset cameraStreamUrl
+    localStorage.removeItem('neptuneOS-settings'); // This will cause useEffect to save new defaults on next render.
     toast({
       title: "Factory Reset Complete",
       description: "All settings have been reset to defaults.",
@@ -132,10 +157,12 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       isDarkMode,
       refreshInterval,
       autoRefresh,
+      cameraStreamUrl, // Provide cameraStreamUrl
       setTemperatureUnit,
       setIsDarkMode,
       setRefreshInterval,
       setAutoRefresh,
+      setCameraStreamUrl, // Provide setCameraStreamUrl
       rebootSystem,
       factoryReset
     }}>
@@ -143,3 +170,4 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     </SettingsContext.Provider>
   );
 };
+
