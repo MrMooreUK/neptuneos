@@ -1,42 +1,41 @@
 
-import { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { useState, useEffect, useCallback } from 'react';
 import { logSecurityEvent, defaultSecurityConfig } from '@/config/security';
 
 interface ConnectionStatus {
   isConnected: boolean;
   lastError?: string;
   retryCount: number;
+  endpoint?: string; // Added to store the endpoint this status refers to
 }
 
 export const useSecureConnection = (endpoint: string) => {
   const [status, setStatus] = useState<ConnectionStatus>({
     isConnected: false,
     retryCount: 0,
-    lastError: undefined, // Ensure lastError is initialized
+    lastError: undefined,
+    endpoint: undefined, // Initialize endpoint as undefined
   });
 
   const checkConnection = useCallback(async () => {
-    if (!endpoint) { // Do not attempt if endpoint is empty
+    if (!endpoint) {
       setStatus({
         isConnected: false,
         lastError: 'Endpoint not configured',
         retryCount: 0,
+        endpoint: endpoint, // Store current (empty) endpoint
       });
       logSecurityEvent('Connection check skipped: no endpoint', { endpoint });
       return;
     }
 
-    // Reset status slightly for retries or new endpoint to show loading state
-    setStatus(prev => ({ ...prev, isConnected: false, lastError: prev.endpointChanged ? undefined : prev.lastError }));
-
+    // Indicate "checking" status. lastError is managed by useEffect or subsequent updates.
+    setStatus(prev => ({ ...prev, isConnected: false }));
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), defaultSecurityConfig.connectionTimeout);
       
-      // Using 'no-cors' mode for HEAD requests to camera streams which might not support CORS for HEAD.
-      // This won't give us the response body or exact status for cross-origin, but can indicate reachability.
-      // For image tags, 'no-cors' is implicitly handled by the browser, but fetch needs it specified for certain checks.
       const response = await fetch(endpoint, {
         method: 'HEAD', 
         signal: controller.signal,
@@ -45,15 +44,11 @@ export const useSecureConnection = (endpoint: string) => {
       
       clearTimeout(timeoutId);
       
-      // For 'no-cors' with 'HEAD', response.ok might be false even if reachable,
-      // but an error thrown (like network error) is a clearer sign of failure.
-      // If fetch completes without throwing, we'll assume it's "connectable" for HEAD no-cors.
-      // A more robust check would be to attempt to load the image in a hidden element if HEAD is unreliable.
-      
-      setStatus({ // Explicitly set all fields
+      setStatus({
         isConnected: true,
         retryCount: 0,
         lastError: undefined,
+        endpoint: endpoint, // Store the successfully connected endpoint
       });
       
       logSecurityEvent('Connection successful', { endpoint });
@@ -63,27 +58,30 @@ export const useSecureConnection = (endpoint: string) => {
       setStatus(prev => ({
         isConnected: false,
         lastError: errorMessage,
-        retryCount: prev.retryCount + 1, // This will be reset if endpoint changes via useEffect re-run
+        retryCount: prev.retryCount + 1,
+        endpoint: endpoint, // Store the endpoint that failed
       }));
       
       logSecurityEvent('Connection failed', { endpoint, error: errorMessage });
     }
-  }, [endpoint]); // Added endpoint to useCallback dependencies
+  }, [endpoint]);
 
   useEffect(() => {
-    // Reset retryCount and lastError when endpoint changes, then check connection.
-    setStatus(prev => ({
-      isConnected: false, // Assume disconnected when endpoint changes until check completes
-      retryCount: 0,
-      lastError: undefined,
-      endpointChanged: prev.endpoint !== endpoint // A temporary flag to help reset logic, not part of ConnectionStatus interface
-    }));
-    checkConnection(); // Check immediately when endpoint changes or component mounts
+    setStatus(prevStatus => {
+      const endpointHasActuallyChanged = prevStatus.endpoint !== endpoint;
+      return {
+        isConnected: false,
+        retryCount: 0,
+        // Reset lastError if the endpoint truly changed or if it's the initial load (prevStatus.endpoint is undefined)
+        lastError: endpointHasActuallyChanged ? undefined : prevStatus.lastError,
+        endpoint: endpoint, // Store the new endpoint
+      };
+    });
+    checkConnection();
     
-    const interval = setInterval(checkConnection, 30000); // Check every 30 seconds
+    const interval = setInterval(checkConnection, 30000);
     return () => clearInterval(interval);
-  }, [endpoint, checkConnection]); // checkConnection is now memoized
+  }, [endpoint, checkConnection]);
 
   return { ...status, checkConnection };
 };
-
