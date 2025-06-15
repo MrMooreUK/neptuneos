@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security';
-import { useSettings as useSettingsAPI } from '@/hooks/useSettingsAPI';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserSettings } from '@/hooks/useUserSettingsAPI';
 
 export type FontFamily = 'sans' | 'serif' | 'mono';
 export type LayoutDensity = 'comfortable' | 'cozy' | 'compact';
@@ -44,9 +45,9 @@ interface SettingsProviderProps {
 }
 
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
-  const { settings, setSetting, isLoading } = useSettingsAPI();
+  const { isAuthenticated } = useAuth();
+  const { settings, setSetting, isLoading } = useUserSettings();
   const { toast } = useToast();
-  const [hasMigrated, setHasMigrated] = useState(false);
 
   // Default values
   const temperatureUnit = settings.temperatureUnit || 'C';
@@ -58,47 +59,20 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const autoRefresh = settings.autoRefresh !== undefined ? settings.autoRefresh : true;
   const cameraStreamUrl = settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl;
 
-  // Migrate from localStorage to SQLite on first load
-  useEffect(() => {
-    if (!isLoading && !hasMigrated) {
-      const savedSettings = localStorage.getItem('neptuneOS-settings');
-      if (savedSettings && Object.keys(settings).length === 0) {
-        try {
-          const localSettings = JSON.parse(savedSettings);
-          console.log('Migrating settings from localStorage to database...');
-          
-          // Migrate each setting
-          Object.entries(localSettings).forEach(([key, value]) => {
-            setSetting({ key, value });
-          });
-          
-          // Clear localStorage after migration
-          localStorage.removeItem('neptuneOS-settings');
-          
-          toast({
-            title: "Settings Migrated",
-            description: "Your settings have been migrated to persistent storage.",
-          });
-        } catch (error) {
-          console.error('Error migrating settings:', error);
-        }
-      }
-      setHasMigrated(true);
-    }
-  }, [isLoading, settings, setSetting, hasMigrated, toast]);
-
   // Apply settings to DOM
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle('dark', isDarkMode);
-    root.classList.remove('font-family-serif', 'font-family-mono');
-    if (fontFamily === 'serif') root.classList.add('font-family-serif');
-    if (fontFamily === 'mono') root.classList.add('font-family-mono');
-    root.style.setProperty('--font-scale', `${fontSize / 100}`);
-    root.classList.remove('density-cozy', 'density-compact');
-    if (layoutDensity === 'cozy') root.classList.add('density-cozy');
-    if (layoutDensity === 'compact') root.classList.add('density-compact');
-  }, [isDarkMode, fontFamily, fontSize, layoutDensity]);
+    if (isAuthenticated) {
+      const root = document.documentElement;
+      root.classList.toggle('dark', isDarkMode);
+      root.classList.remove('font-family-serif', 'font-family-mono');
+      if (fontFamily === 'serif') root.classList.add('font-family-serif');
+      if (fontFamily === 'mono') root.classList.add('font-family-mono');
+      root.style.setProperty('--font-scale', `${fontSize / 100}`);
+      root.classList.remove('density-cozy', 'density-compact');
+      if (layoutDensity === 'cozy') root.classList.add('density-cozy');
+      if (layoutDensity === 'compact') root.classList.add('density-compact');
+    }
+  }, [isAuthenticated, isDarkMode, fontFamily, fontSize, layoutDensity]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setSetting({ key: 'temperatureUnit', value: unit });

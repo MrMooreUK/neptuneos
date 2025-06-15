@@ -1,14 +1,22 @@
 
-import { Fish, Activity, RefreshCw, Settings } from 'lucide-react';
+import { Fish, Activity, RefreshCw, Settings, User, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardHeaderProps {
   onRefresh: () => void;
 }
 
 const DashboardHeader = ({ onRefresh }: DashboardHeaderProps) => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl shadow-lg border-b border-blue-200/30 dark:border-slate-700/50 sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -51,6 +59,31 @@ const DashboardHeader = ({ onRefresh }: DashboardHeaderProps) => {
                 <span className="hidden sm:inline font-medium">Settings</span>
               </Button>
             </Link>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center space-x-2 px-3 py-2 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 border-gray-200 dark:border-slate-600 rounded-xl transition-all duration-200">
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline font-medium">{user?.username}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user?.username}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    <Badge variant="secondary" className="text-xs w-fit">
+                      {user?.role}
+                    </Badge>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
