@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # NeptuneOS Automated Installer for Raspberry Pi
@@ -75,9 +76,17 @@ npm install
 npm run build
 log_success "Frontend built successfully."
 
+# --- Backend Setup ---
+log_info "⚙️ Setting up backend dependencies..."
+cd deploy
+log_info "Installing backend dependencies (express, cors)..."
+npm install
+cd ..
+log_success "Backend dependencies installed."
+
 # --- Backend Setup (with PM2) ---
-log_info "⚙️ Setting up the backend API server with PM2..."
-pm2 start deploy/ecosystem.config.js
+log_info "⚙️ Starting the backend API server with PM2..."
+pm2 start deploy/ecosystem.config.cjs
 CURRENT_USER=$(logname)
 log_info "Creating PM2 startup script to run on boot for user: $CURRENT_USER..."
 sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $CURRENT_USER --hp /home/$CURRENT_USER
