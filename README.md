@@ -1,4 +1,3 @@
-
 # 🌊 NeptuneOS - Aquarium Monitoring System
 
 <div align="center">
@@ -49,36 +48,13 @@ NeptuneOS is a sophisticated aquarium monitoring system that provides real-time 
 - **Filtration Management** - Filter monitoring and control
 - **Feeding Automation** - Scheduled feeding system
 
-## 🚀 Quick Start
+## 🚀 Getting Started & Documentation
 
-### Prerequisites
-- **Node.js** (v16 or higher)
-- **npm** or **yarn** package manager
+NeptuneOS is designed for easy deployment on a Raspberry Pi as a dedicated monitoring appliance. For detailed instructions on installation, hardware setup, development, and deployment, please refer to our comprehensive setup guide:
 
-### Installation
+➡️ **[Full Setup & Deployment Guide (SETUP.md)](./SETUP.md)**
 
-1. **Clone the repository**
-   ```bash
-   git clone <YOUR_GIT_URL>
-   cd <YOUR_PROJECT_NAME>
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. **Start development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-4. **Open in browser**
-   Navigate to `http://localhost:5173`
+This single guide contains everything you need, from one-click automated installation to manual setup and troubleshooting.
 
 ## 🛠️ Tech Stack
 
@@ -124,7 +100,7 @@ src/
 
 ## 🎯 API Integration
 
-The app is designed to work with aquarium monitoring hardware. Currently uses mock data for demonstration:
+The app connects to a backend API for sensor data and a camera for a live video feed. These endpoints are configured to work seamlessly with the Raspberry Pi deployment. For more details, see the [deployment section in our setup guide](./SETUP.md).
 
 ### Temperature API
 ```typescript
@@ -192,23 +168,7 @@ NeptuneOS is fully responsive and optimized for:
 
 ## 🚀 Deployment
 
-### Lovable Platform
-1. Click "Publish" in the Lovable editor
-2. Your app will be available at `yoursite.lovable.app`
-
-### Custom Domain
-1. Navigate to Project > Settings > Domains
-2. Connect your custom domain
-3. Follow DNS configuration instructions
-
-### Self-Hosting
-```bash
-# Build for production
-npm run build
-
-# Serve static files
-npm run preview
-```
+All deployment instructions have been consolidated into our comprehensive [Setup Guide](./SETUP.md).
 
 ## 🤝 Contributing
 
