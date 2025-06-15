@@ -1,70 +1,36 @@
 
-import { Camera, WifiOff, Play, Maximize, Minimize, Smartphone } from 'lucide-react';
+import { Camera, WifiOff, Play, Maximize, Smartphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useSecureConnection } from '@/hooks/useSecureConnection';
-import { useState, useEffect, useRef } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useState } from 'react';
+import { useCameraStream } from '@/hooks/useCameraStream';
+import CameraDisplay from './CameraDisplay';
+import CameraFullscreenOverlay from './CameraFullscreenOverlay';
 
 const LiveCameraFeed = () => {
   const { cameraStreamUrl } = useSettings();
   const { isConnected, lastError } = useSecureConnection(cameraStreamUrl);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const isMobile = useIsMobile();
-  const imgRef = useRef<HTMLImageElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-    setImageError(false);
-    setRetryCount(0);
-    console.log("Camera stream loaded successfully");
-  };
-
-  const handleImageError = () => {
-    setImageLoaded(false);
-    setImageError(true);
-    console.error("Camera stream error - image failed to load", { retryCount, isMobile });
-    
-    // Auto-retry on mobile with exponential backoff
-    if (isMobile && retryCount < 3) {
-      const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-      timeoutRef.current = setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-        if (imgRef.current) {
-          imgRef.current.src = `${cameraStreamUrl}?t=${Date.now()}`;
-        }
-      }, delay);
-    }
-  };
+  
+  const streamUrl = cameraStreamUrl ? `${cameraStreamUrl}?t=${Date.now()}` : '';
+  const {
+    imageLoaded,
+    imageError,
+    retryCount,
+    imgRef,
+    handleImageLoad,
+    handleImageError,
+    forceRefresh,
+    isMobile
+  } = useCameraStream(streamUrl);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
 
-  const forceRefresh = () => {
-    setRetryCount(0);
-    setImageError(false);
-    if (imgRef.current) {
-      imgRef.current.src = `${cameraStreamUrl}?t=${Date.now()}`;
-    }
-  };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   const isStreamActive = isConnected && imageLoaded && !imageError;
-  const streamUrl = cameraStreamUrl ? `${cameraStreamUrl}?t=${Date.now()}` : '';
 
   return (
     <>
@@ -113,41 +79,18 @@ const LiveCameraFeed = () => {
         <CardContent className="relative z-10 pb-4">
           <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 rounded-xl overflow-hidden shadow-inner border border-gray-200/50 dark:border-slate-600/50 relative group/video max-w-md mx-auto">
             {isConnected ? (
-              <>
-                <img 
-                  ref={imgRef}
-                  src={streamUrl}
-                  alt="Live aquarium feed" 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover/video:scale-105"
-                  onLoad={handleImageLoad}
-                  onError={handleImageError}
-                  style={{ display: imageError ? 'none' : 'block' }}
-                  crossOrigin="anonymous"
-                />
-                {isStreamActive && (
-                  <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                    <span>LIVE</span>
-                  </div>
-                )}
-                {(imageError || !imageLoaded) && (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 p-4">
-                    <div className="relative mb-3">
-                      <div className="p-4 bg-gray-200/50 dark:bg-slate-600/50 rounded-full">
-                        <WifiOff className="w-8 h-8 text-red-500" />
-                      </div>
-                      <div className="absolute inset-0 bg-red-500/10 rounded-full animate-ping"></div>
-                    </div>
-                    <p className="font-semibold text-sm mb-1">Stream Not Available</p>
-                    <p className="text-xs text-center opacity-75 mb-2">
-                      {isMobile ? 'Mobile stream issue detected' : 'Camera stream failed to load'}
-                    </p>
-                    {retryCount > 0 && (
-                      <p className="text-xs text-blue-500">Retry {retryCount}/3</p>
-                    )}
-                  </div>
-                )}
-              </>
+              <CameraDisplay
+                streamUrl={streamUrl}
+                isConnected={isConnected}
+                imageLoaded={imageLoaded}
+                imageError={imageError}
+                retryCount={retryCount}
+                isMobile={isMobile}
+                imgRef={imgRef}
+                onImageLoad={handleImageLoad}
+                onImageError={handleImageError}
+                className="relative w-full h-full"
+              />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 p-4">
                 <div className="relative mb-3">
@@ -182,122 +125,20 @@ const LiveCameraFeed = () => {
       </Card>
 
       {/* Fullscreen Overlay */}
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center animate-fade-in">
-          <div className="relative w-full h-full flex flex-col">
-            {/* Fullscreen Header */}
-            <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-white font-semibold">Live Camera Feed</h2>
-                  <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${isStreamActive ? 'bg-green-500' : 'bg-red-500'} ${isStreamActive ? 'animate-pulse' : ''}`}></div>
-                    <span className="text-white/80 text-sm">
-                      {isStreamActive ? 'Live' : 'Offline'}
-                      {isMobile && <Smartphone className="w-3 h-3 ml-1 inline" />}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                {!isStreamActive && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={forceRefresh}
-                    className="text-white hover:bg-white/10 p-3"
-                  >
-                    <Play className="w-5 h-5" />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleFullscreen}
-                  className="text-white hover:bg-white/10 p-3"
-                >
-                  <Minimize className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Fullscreen Video Container */}
-            <div className="flex-1 flex items-center justify-center p-8">
-              <div className="relative w-full h-full max-w-7xl max-h-full bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden shadow-2xl">
-                {isConnected ? (
-                  <>
-                    <img 
-                      src={streamUrl}
-                      alt="Live aquarium feed" 
-                      className="w-full h-full object-contain"
-                      onLoad={handleImageLoad}
-                      onError={handleImageError}
-                      style={{ display: imageError ? 'none' : 'block' }}
-                      crossOrigin="anonymous"
-                    />
-                    {isStreamActive && (
-                      <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 shadow-lg">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        <span>LIVE</span>
-                      </div>
-                    )}
-                    {(imageError || !imageLoaded) && (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-white p-8">
-                        <div className="relative mb-6">
-                          <div className="p-8 bg-white/10 rounded-full backdrop-blur-sm">
-                            <WifiOff className="w-16 h-16 text-red-400" />
-                          </div>
-                          <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
-                        </div>
-                        <p className="font-semibold text-xl mb-3">Stream Not Available</p>
-                        <p className="text-lg text-center opacity-75 mb-2">
-                          {isMobile ? 'Mobile stream compatibility issue' : 'Camera stream failed to load'}
-                        </p>
-                        {retryCount > 0 && (
-                          <p className="text-lg text-blue-400">Retry attempt {retryCount}/3</p>
-                        )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-white p-8">
-                    <div className="relative mb-6">
-                      <div className="p-8 bg-white/10 rounded-full backdrop-blur-sm">
-                        <WifiOff className="w-16 h-16 text-red-400" />
-                      </div>
-                      <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
-                    </div>
-                    <p className="font-semibold text-xl mb-3">Camera Offline</p>
-                    <p className="text-lg text-center opacity-75 mb-4">
-                      {lastError && `Error: ${lastError}`}
-                      {!cameraStreamUrl && 'Camera URL not configured'}
-                      {cameraStreamUrl && !lastError && 'Attempting to connect...'}
-                    </p>
-                    {cameraStreamUrl && !lastError && (
-                      <div className="flex items-center space-x-3 text-blue-400">
-                        <Play className="w-5 h-5" />
-                        <span className="text-lg">Connecting to stream...</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Fullscreen Footer */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
-              <div className="flex items-center justify-center space-x-8 text-white/80 text-sm">
-                <span>Resolution: 1080p</span>
-                <span>FPS: 30</span>
-                <span>Quality: HD</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CameraFullscreenOverlay
+        isVisible={isFullscreen}
+        streamUrl={streamUrl}
+        isConnected={isConnected}
+        imageLoaded={imageLoaded}
+        imageError={imageError}
+        retryCount={retryCount}
+        isMobile={isMobile}
+        imgRef={imgRef}
+        onImageLoad={handleImageLoad}
+        onImageError={handleImageError}
+        onClose={toggleFullscreen}
+        onForceRefresh={forceRefresh}
+      />
     </>
   );
 };
