@@ -12,9 +12,9 @@ Welcome to the NeptuneOS community! We're excited that you want to contribute to
    git clone https://github.com/YOUR_USERNAME/neptuneos.git
    cd neptuneos
    ```
-3. **Add upstream** remote:
+3. **Add upstream** remote to sync changes from the main repository:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/neptuneos.git
+   git remote add upstream https://github.com/lovable-community/neptuneos.git
    ```
 
 ### 🛠️ Development Setup

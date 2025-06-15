@@ -5,18 +5,34 @@ This guide provides comprehensive instructions for setting up NeptuneOS, whether
 
 ---
 
-## 1. 🚀 Automated Installation (Recommended for Raspberry Pi)
+## 1. 🚀 Installation (Recommended for Raspberry Pi)
 
-For the fastest setup, run this one-line command on your Raspberry Pi terminal. This will download and execute the installation script, which automates all the necessary steps to turn your Pi into a NeptuneOS appliance.
+Follow these steps to install NeptuneOS on your Raspberry Pi. This process ensures you are running the code from your own repository fork.
+
+### Step 1: Fork and Clone the Repository
+
+1.  **Fork** the [NeptuneOS repository](https://github.com/lovable-community/neptuneos) on GitHub to your own account.
+2.  **Connect** to your Raspberry Pi via SSH or with a monitor and keyboard.
+3.  **Clone** your forked repository. Replace `YOUR_USERNAME` with your GitHub username:
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/neptuneos.git
+    ```
+4.  **Navigate** into the project directory:
+    ```bash
+    cd neptuneos
+    ```
+
+### Step 2: Run the Automated Installer
+
+Once inside the `neptuneos` directory, run the installation script. This will set up all necessary software and configure your Pi.
 
 ```bash
-curl -sL https://raw.githubusercontent.com/lovable-community/neptuneos/main/deploy/install.sh | sudo bash
+sudo bash deploy/install.sh
 ```
 
-### What the Automated Script Does:
+### What the Installer Does:
 - ✅ Updates and upgrades your Raspberry Pi OS.
 - ✅ Installs necessary software: `git`, `nginx`, `nodejs`, `npm`, and `pm2`.
-- ✅ Clones the NeptuneOS repository from GitHub.
 - ✅ Builds the React frontend for production.
 - ✅ Configures `nginx` as a reverse proxy for the frontend, backend API, and camera stream.
 - ✅ Sets up the backend API server to run automatically on boot using `pm2`.
@@ -38,8 +54,9 @@ If you wish to contribute to NeptuneOS or run it in a local development environm
 
 ### Local Installation
 ```bash
-# 1. Clone the repository
-git clone https://github.com/lovable-community/neptuneos.git
+# 1. Fork the repository (if you haven't already) and clone it
+# Replace YOUR_USERNAME with your GitHub username
+git clone https://github.com/YOUR_USERNAME/neptuneos.git
 cd neptuneos
 
 # 2. Install dependencies

@@ -1,9 +1,9 @@
-
 #!/bin/bash
 
 # NeptuneOS Automated Installer for Raspberry Pi
 # This script installs all necessary dependencies, sets up the API server,
 # and configures the system to run NeptuneOS on boot.
+# It should be run from the root of the cloned neptuneos repository.
 
 echo "🌊 Starting NeptuneOS Installation..."
 
@@ -20,19 +20,6 @@ sudo apt-get install -y nodejs
 
 echo "🚀 Installing PM2 for process management..."
 sudo npm install -g pm2
-
-# --- Clone Repository ---
-# Note: In a real one-liner curl | bash scenario, you might want to cd to /home/pi
-if [ ! -d "neptuneos" ]; then
-    echo "Cloning NeptuneOS repository..."
-    # IMPORTANT: Replace with your actual repository URL
-    git clone https://github.com/lovable-community/neptuneos.git 
-    cd neptuneos
-else
-    echo "NeptuneOS directory already exists. Pulling latest changes..."
-    cd neptuneos
-    git pull
-fi
 
 # --- Frontend Setup ---
 echo "🏗️ Building the frontend..."

@@ -54,7 +54,7 @@ NeptuneOS is designed for easy deployment on a Raspberry Pi as a dedicated monit
 
 ➡️ **[Full Setup & Deployment Guide (SETUP.md)](./SETUP.md)**
 
-This single guide contains everything you need, from one-click automated installation to manual setup and troubleshooting.
+This guide contains everything you need, from automated installation to manual setup and troubleshooting.
 
 ## 🛠️ Tech Stack
 
@@ -172,13 +172,9 @@ All deployment instructions have been consolidated into our comprehensive [Setup
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
 
-1. 🍴 Fork the repository
-2. 🌿 Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. 💾 Commit changes (`git commit -m 'Add amazing feature'`)
-4. 📤 Push to branch (`git push origin feature/amazing-feature`)
-5. 📝 Open a Pull Request
+Please read our **[CONTRIBUTING.md](./CONTRIBUTING.md)** guide for detailed instructions on how to get started, our development workflow, and coding standards.
 
 ## 📄 License
 
@@ -202,3 +198,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
   <strong>🌊 Dive into the future of aquarium monitoring with NeptuneOS! 🐠</strong>
 </div>
+
+</initial_code>
