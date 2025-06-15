@@ -107,9 +107,14 @@ if [ ! -L /etc/nginx/sites-enabled/neptuneos ]; then
 fi
 log_info "Testing Nginx configuration..."
 sudo nginx -t
-log_info "Restarting Nginx..."
-sudo systemctl restart nginx
-log_success "Nginx configured."
+if [ $? -eq 0 ]; then
+    log_info "Restarting Nginx..."
+    sudo systemctl restart nginx
+    log_success "Nginx configured and restarted successfully."
+else
+    log_error "Nginx configuration test failed. Please check the configuration."
+    exit 1
+fi
 
 # --- Camera Streaming Setup (mjpg-streamer) ---
 log_info "📹 Setting up camera streaming service (mjpg-streamer)..."
