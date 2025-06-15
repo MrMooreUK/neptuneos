@@ -31,15 +31,6 @@ const Index = () => {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Main Content Grid */}
         <div className="space-y-8">
-          {/* Camera Feed at the top */}
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
-              <div className="w-1 h-6 bg-purple-500 rounded-full mr-3"></div>
-              Live Feed
-            </h2>
-            <LiveCameraFeed />
-          </section>
-
           {/* Status Overview */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -47,6 +38,15 @@ const Index = () => {
               System Overview
             </h2>
             <StatusOverviewGrid avgTemp={avgTemp} lastUpdated={lastUpdated} />
+          </section>
+
+          {/* Camera Feed */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+              <div className="w-1 h-6 bg-purple-500 rounded-full mr-3"></div>
+              Live Feed
+            </h2>
+            <LiveCameraFeed />
           </section>
 
           {/* Temperature Monitoring */}
