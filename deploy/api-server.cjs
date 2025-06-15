@@ -3,9 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const os = require('os');
 const { exec } = require('child_process');
+const Database = require('./database.cjs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const db = new Database();
 
 // Enhanced logging
 const log = (message) => {
@@ -14,6 +16,13 @@ const log = (message) => {
 
 app.use(cors());
 app.use(express.json());
+
+// Initialize database connection
+db.connect().then(() => {
+  log('Database initialized successfully');
+}).catch((err) => {
+  log(`Database initialization failed: ${err.message}`);
+});
 
 // Helper to get local IP Address
 const getIpAddress = () => {
@@ -87,6 +96,84 @@ app.get('/api/temperature', (req, res) => {
     res.json(data);
 });
 
+// Settings endpoints
+app.get('/api/settings', async (req, res) => {
+    try {
+        log('Settings requested');
+        const settings = await db.getAllSettings();
+        res.json(settings);
+    } catch (error) {
+        log(`Settings get error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to retrieve settings' });
+    }
+});
+
+app.get('/api/settings/:key', async (req, res) => {
+    try {
+        const { key } = req.params;
+        log(`Setting requested: ${key}`);
+        const value = await db.getSetting(key);
+        if (value !== null) {
+            res.json({ key, value });
+        } else {
+            res.status(404).json({ error: 'Setting not found' });
+        }
+    } catch (error) {
+        log(`Setting get error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to retrieve setting' });
+    }
+});
+
+app.post('/api/settings', async (req, res) => {
+    try {
+        const { key, value } = req.body;
+        log(`Setting update: ${key}`);
+        await db.setSetting(key, value);
+        res.json({ success: true, key, value });
+    } catch (error) {
+        log(`Settings post error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to save setting' });
+    }
+});
+
+app.put('/api/settings/:key', async (req, res) => {
+    try {
+        const { key } = req.params;
+        const { value } = req.body;
+        log(`Setting update: ${key}`);
+        await db.setSetting(key, value);
+        res.json({ success: true, key, value });
+    } catch (error) {
+        log(`Settings put error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to update setting' });
+    }
+});
+
+// Temperature history endpoints
+app.get('/api/temperature/history', async (req, res) => {
+    try {
+        const { sensorId, limit } = req.query;
+        log('Temperature history requested');
+        const history = await db.getTemperatureHistory(sensorId, limit ? parseInt(limit) : 100);
+        res.json(history);
+    } catch (error) {
+        log(`Temperature history error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to retrieve temperature history' });
+    }
+});
+
+app.post('/api/temperature/log', async (req, res) => {
+    try {
+        const { sensorId, temperature, unit } = req.body;
+        log(`Temperature logged: ${temperature}°${unit} for sensor ${sensorId}`);
+        await db.addTemperatureReading(sensorId, temperature, unit);
+        res.json({ success: true });
+    } catch (error) {
+        log(`Temperature log error: ${error.message}`);
+        res.status(500).json({ error: 'Failed to log temperature' });
+    }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     log(`Unhandled error: ${err.message}`);
@@ -100,18 +187,15 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-    log('SIGTERM received, shutting down gracefully');
+const gracefulShutdown = () => {
+    log('Shutting down gracefully');
     server.close(() => {
-        log('Server closed');
-        process.exit(0);
+        db.close().then(() => {
+            log('Server and database closed');
+            process.exit(0);
+        });
     });
-});
+};
 
-process.on('SIGINT', () => {
-    log('SIGINT received, shutting down gracefully');
-    server.close(() => {
-        log('Server closed');
-        process.exit(0);
-    });
-});
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);

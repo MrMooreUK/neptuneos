@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security';
+import { useSettings as useSettingsAPI } from '@/hooks/useSettingsAPI';
 
 export type FontFamily = 'sans' | 'serif' | 'mono';
 export type LayoutDensity = 'comfortable' | 'cozy' | 'compact';
@@ -10,7 +11,7 @@ interface SettingsContextType {
   temperatureUnit: 'C' | 'F';
   isDarkMode: boolean;
   fontFamily: FontFamily;
-  fontSize: number; // as percentage, e.g. 100
+  fontSize: number;
   layoutDensity: LayoutDensity;
   refreshInterval: number;
   autoRefresh: boolean;
@@ -25,6 +26,7 @@ interface SettingsContextType {
   setCameraStreamUrl: (url: string) => void;
   rebootSystem: () => void;
   factoryReset: () => void;
+  isLoading: boolean;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -42,39 +44,50 @@ interface SettingsProviderProps {
 }
 
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
-  const [temperatureUnit, setTemperatureUnitState] = useState<'C' | 'F'>('C');
-  const [isDarkMode, setIsDarkModeState] = useState(false);
-  const [fontFamily, setFontFamilyState] = useState<FontFamily>('sans');
-  const [fontSize, setFontSizeState] = useState(100);
-  const [layoutDensity, setLayoutDensityState] = useState<LayoutDensity>('comfortable');
-  const [refreshInterval, setRefreshIntervalState] = useState(10);
-  const [autoRefresh, setAutoRefreshState] = useState(true);
-  const [cameraStreamUrl, setCameraStreamUrlState] = useState<string>(defaultSecurityConfig.cameraStreamUrl);
+  const { settings, setSetting, isLoading } = useSettingsAPI();
   const { toast } = useToast();
+  const [hasMigrated, setHasMigrated] = useState(false);
 
+  // Default values
+  const temperatureUnit = settings.temperatureUnit || 'C';
+  const isDarkMode = settings.isDarkMode || false;
+  const fontFamily = settings.fontFamily || 'sans';
+  const fontSize = settings.fontSize || 100;
+  const layoutDensity = settings.layoutDensity || 'comfortable';
+  const refreshInterval = settings.refreshInterval || 10;
+  const autoRefresh = settings.autoRefresh !== undefined ? settings.autoRefresh : true;
+  const cameraStreamUrl = settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl;
+
+  // Migrate from localStorage to SQLite on first load
   useEffect(() => {
-    const savedSettings = localStorage.getItem('neptuneOS-settings');
-    if (savedSettings) {
-      try {
-        const settings = JSON.parse(savedSettings);
-        setTemperatureUnitState(settings.temperatureUnit || 'C');
-        setIsDarkModeState(settings.isDarkMode || false);
-        setFontFamilyState(settings.fontFamily || 'sans');
-        setFontSizeState(settings.fontSize || 100);
-        setLayoutDensityState(settings.layoutDensity || 'comfortable');
-        setRefreshIntervalState(settings.refreshInterval || 10);
-        setAutoRefreshState(settings.autoRefresh !== undefined ? settings.autoRefresh : true);
-        setCameraStreamUrlState(settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl);
-      } catch (error) {
-        console.log('Error loading settings from localStorage:', error);
-        setFontFamilyState('sans');
-        setFontSizeState(100);
-        setLayoutDensityState('comfortable');
-        setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl);
+    if (!isLoading && !hasMigrated) {
+      const savedSettings = localStorage.getItem('neptuneOS-settings');
+      if (savedSettings && Object.keys(settings).length === 0) {
+        try {
+          const localSettings = JSON.parse(savedSettings);
+          console.log('Migrating settings from localStorage to database...');
+          
+          // Migrate each setting
+          Object.entries(localSettings).forEach(([key, value]) => {
+            setSetting({ key, value });
+          });
+          
+          // Clear localStorage after migration
+          localStorage.removeItem('neptuneOS-settings');
+          
+          toast({
+            title: "Settings Migrated",
+            description: "Your settings have been migrated to persistent storage.",
+          });
+        } catch (error) {
+          console.error('Error migrating settings:', error);
+        }
       }
+      setHasMigrated(true);
     }
-  }, []);
+  }, [isLoading, settings, setSetting, hasMigrated, toast]);
 
+  // Apply settings to DOM
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle('dark', isDarkMode);
@@ -87,22 +100,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     if (layoutDensity === 'compact') root.classList.add('density-compact');
   }, [isDarkMode, fontFamily, fontSize, layoutDensity]);
 
-  useEffect(() => {
-    const settings = {
-      temperatureUnit,
-      isDarkMode,
-      fontFamily,
-      fontSize,
-      layoutDensity,
-      refreshInterval,
-      autoRefresh,
-      cameraStreamUrl,
-    };
-    localStorage.setItem('neptuneOS-settings', JSON.stringify(settings));
-  }, [temperatureUnit, isDarkMode, fontFamily, fontSize, layoutDensity, refreshInterval, autoRefresh, cameraStreamUrl]);
-
   const setTemperatureUnit = (unit: 'C' | 'F') => {
-    setTemperatureUnitState(unit);
+    setSetting({ key: 'temperatureUnit', value: unit });
     toast({
       title: "Temperature Unit Updated",
       description: `Temperature unit changed to °${unit}`,
@@ -110,7 +109,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setIsDarkMode = (isDark: boolean) => {
-    setIsDarkModeState(isDark);
+    setSetting({ key: 'isDarkMode', value: isDark });
     toast({
       title: "Theme Updated",
       description: `Switched to ${isDark ? 'dark' : 'light'} mode`,
@@ -118,7 +117,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setFontFamily = (font: FontFamily) => {
-    setFontFamilyState(font);
+    setSetting({ key: 'fontFamily', value: font });
     toast({
       title: "Font Changed",
       description: `UI font set to ${font.charAt(0).toUpperCase() + font.slice(1)}`,
@@ -126,7 +125,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setFontSize = (size: number) => {
-    setFontSizeState(size);
+    setSetting({ key: 'fontSize', value: size });
     toast({
       title: "Font Size Updated",
       description: `Base font size set to ${size}%`,
@@ -134,7 +133,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setLayoutDensity = (density: LayoutDensity) => {
-    setLayoutDensityState(density);
+    setSetting({ key: 'layoutDensity', value: density });
     toast({
       title: "Layout Density Changed",
       description: `Layout density set to ${density.charAt(0).toUpperCase() + density.slice(1)}`,
@@ -142,7 +141,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setRefreshInterval = (interval: number) => {
-    setRefreshIntervalState(interval);
+    setSetting({ key: 'refreshInterval', value: interval });
     toast({
       title: "Refresh Interval Updated",
       description: `Data will refresh every ${interval} seconds`,
@@ -150,7 +149,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setAutoRefresh = (auto: boolean) => {
-    setAutoRefreshState(auto);
+    setSetting({ key: 'autoRefresh', value: auto });
     toast({
       title: "Auto Refresh Updated",
       description: `Auto refresh ${auto ? 'enabled' : 'disabled'}`,
@@ -159,7 +158,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 
   const setCameraStreamUrl = (url: string) => {
     if (validateNetworkEndpoint(url)) {
-      setCameraStreamUrlState(url);
+      setSetting({ key: 'cameraStreamUrl', value: url });
       toast({
         title: "Camera Stream URL Updated",
         description: `Camera stream URL configured.`,
@@ -183,15 +182,21 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 
   const factoryReset = () => {
     console.log('Factory reset initiated...');
-    setTemperatureUnitState('C');
-    setIsDarkModeState(false);
-    setFontFamilyState('sans');
-    setFontSizeState(100);
-    setLayoutDensityState('comfortable');
-    setRefreshIntervalState(10);
-    setAutoRefreshState(true);
-    setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl);
-    localStorage.removeItem('neptuneOS-settings');
+    const defaultSettings = {
+      temperatureUnit: 'C',
+      isDarkMode: false,
+      fontFamily: 'sans',
+      fontSize: 100,
+      layoutDensity: 'comfortable',
+      refreshInterval: 10,
+      autoRefresh: true,
+      cameraStreamUrl: defaultSecurityConfig.cameraStreamUrl,
+    };
+    
+    Object.entries(defaultSettings).forEach(([key, value]) => {
+      setSetting({ key, value });
+    });
+    
     toast({
       title: "Factory Reset Complete",
       description: "All settings have been reset to defaults.",
@@ -217,7 +222,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       setAutoRefresh,
       setCameraStreamUrl,
       rebootSystem,
-      factoryReset
+      factoryReset,
+      isLoading,
     }}>
       {children}
     </SettingsContext.Provider>
