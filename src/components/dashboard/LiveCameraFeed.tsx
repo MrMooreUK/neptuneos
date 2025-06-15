@@ -1,10 +1,11 @@
 
-import { Camera, WifiOff, Play, Maximize, Minimize } from 'lucide-react';
+import { Camera, WifiOff, Play, Maximize, Minimize, Smartphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useSecureConnection } from '@/hooks/useSecureConnection';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const LiveCameraFeed = () => {
   const { cameraStreamUrl } = useSettings();
@@ -12,23 +13,58 @@ const LiveCameraFeed = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const isMobile = useIsMobile();
+  const imgRef = useRef<HTMLImageElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const handleImageLoad = () => {
     setImageLoaded(true);
     setImageError(false);
+    setRetryCount(0);
+    console.log("Camera stream loaded successfully");
   };
 
   const handleImageError = () => {
     setImageLoaded(false);
     setImageError(true);
-    console.error("Camera stream error - image failed to load");
+    console.error("Camera stream error - image failed to load", { retryCount, isMobile });
+    
+    // Auto-retry on mobile with exponential backoff
+    if (isMobile && retryCount < 3) {
+      const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+      timeoutRef.current = setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+        if (imgRef.current) {
+          imgRef.current.src = `${cameraStreamUrl}?t=${Date.now()}`;
+        }
+      }, delay);
+    }
   };
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
 
+  const forceRefresh = () => {
+    setRetryCount(0);
+    setImageError(false);
+    if (imgRef.current) {
+      imgRef.current.src = `${cameraStreamUrl}?t=${Date.now()}`;
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const isStreamActive = isConnected && imageLoaded && !imageError;
+  const streamUrl = cameraStreamUrl ? `${cameraStreamUrl}?t=${Date.now()}` : '';
 
   return (
     <>
@@ -47,18 +83,31 @@ const LiveCameraFeed = () => {
                   <div className={`w-2 h-2 rounded-full mr-2 ${isStreamActive ? 'bg-green-500' : 'bg-red-500'} ${isStreamActive ? 'animate-pulse' : ''}`}></div>
                   <span className="text-xs text-gray-600 dark:text-gray-400">
                     {isStreamActive ? 'Live' : 'Offline'}
+                    {isMobile && <Smartphone className="w-3 h-3 ml-1 inline" />}
                   </span>
                 </div>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleFullscreen}
-              className="p-2 hover:bg-cyan-100 dark:hover:bg-cyan-900/50"
-            >
-              <Maximize className="w-4 h-4" />
-            </Button>
+            <div className="flex space-x-2">
+              {!isStreamActive && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={forceRefresh}
+                  className="p-2 hover:bg-cyan-100 dark:hover:bg-cyan-900/50"
+                >
+                  <Play className="w-4 h-4" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleFullscreen}
+                className="p-2 hover:bg-cyan-100 dark:hover:bg-cyan-900/50"
+              >
+                <Maximize className="w-4 h-4" />
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="relative z-10 pb-4">
@@ -66,12 +115,14 @@ const LiveCameraFeed = () => {
             {isConnected ? (
               <>
                 <img 
-                  src={cameraStreamUrl} 
+                  ref={imgRef}
+                  src={streamUrl}
                   alt="Live aquarium feed" 
                   className="w-full h-full object-cover transition-transform duration-300 group-hover/video:scale-105"
                   onLoad={handleImageLoad}
                   onError={handleImageError}
                   style={{ display: imageError ? 'none' : 'block' }}
+                  crossOrigin="anonymous"
                 />
                 {isStreamActive && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
@@ -88,9 +139,12 @@ const LiveCameraFeed = () => {
                       <div className="absolute inset-0 bg-red-500/10 rounded-full animate-ping"></div>
                     </div>
                     <p className="font-semibold text-sm mb-1">Stream Not Available</p>
-                    <p className="text-xs text-center opacity-75">
-                      Camera stream failed to load
+                    <p className="text-xs text-center opacity-75 mb-2">
+                      {isMobile ? 'Mobile stream issue detected' : 'Camera stream failed to load'}
                     </p>
+                    {retryCount > 0 && (
+                      <p className="text-xs text-blue-500">Retry {retryCount}/3</p>
+                    )}
                   </div>
                 )}
               </>
@@ -143,18 +197,31 @@ const LiveCameraFeed = () => {
                     <div className={`w-2 h-2 rounded-full mr-2 ${isStreamActive ? 'bg-green-500' : 'bg-red-500'} ${isStreamActive ? 'animate-pulse' : ''}`}></div>
                     <span className="text-white/80 text-sm">
                       {isStreamActive ? 'Live' : 'Offline'}
+                      {isMobile && <Smartphone className="w-3 h-3 ml-1 inline" />}
                     </span>
                   </div>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleFullscreen}
-                className="text-white hover:bg-white/10 p-3"
-              >
-                <Minimize className="w-5 h-5" />
-              </Button>
+              <div className="flex space-x-2">
+                {!isStreamActive && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={forceRefresh}
+                    className="text-white hover:bg-white/10 p-3"
+                  >
+                    <Play className="w-5 h-5" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleFullscreen}
+                  className="text-white hover:bg-white/10 p-3"
+                >
+                  <Minimize className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
 
             {/* Fullscreen Video Container */}
@@ -163,12 +230,13 @@ const LiveCameraFeed = () => {
                 {isConnected ? (
                   <>
                     <img 
-                      src={cameraStreamUrl} 
+                      src={streamUrl}
                       alt="Live aquarium feed" 
                       className="w-full h-full object-contain"
                       onLoad={handleImageLoad}
                       onError={handleImageError}
                       style={{ display: imageError ? 'none' : 'block' }}
+                      crossOrigin="anonymous"
                     />
                     {isStreamActive && (
                       <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 shadow-lg">
@@ -185,9 +253,12 @@ const LiveCameraFeed = () => {
                           <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
                         </div>
                         <p className="font-semibold text-xl mb-3">Stream Not Available</p>
-                        <p className="text-lg text-center opacity-75">
-                          Camera stream failed to load
+                        <p className="text-lg text-center opacity-75 mb-2">
+                          {isMobile ? 'Mobile stream compatibility issue' : 'Camera stream failed to load'}
                         </p>
+                        {retryCount > 0 && (
+                          <p className="text-lg text-blue-400">Retry attempt {retryCount}/3</p>
+                        )}
                       </div>
                     )}
                   </>
