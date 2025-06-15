@@ -21,9 +21,14 @@ const ThemePreview = () => {
               <Badge variant="secondary">Info</Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-between pt-2">
-            <p className="text-sm text-muted-foreground">This is a preview.</p>
-            <Button size="sm">Click me</Button>
+          <CardContent className="flex flex-col items-start gap-4 pt-2">
+            <p className="text-sm text-muted-foreground">
+              The quick brown fox jumps over the lazy dog. This preview updates in real-time to reflect your choices.
+            </p>
+            <div className="flex w-full items-center justify-between">
+              <p className="text-xs text-muted-foreground font-mono">ID: 123-ABC-789</p>
+              <Button size="sm">Click me</Button>
+            </div>
           </CardContent>
         </Card>
       </div>

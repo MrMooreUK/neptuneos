@@ -1,22 +1,30 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security'; // Added validateNetworkEndpoint and defaultSecurityConfig
+import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security';
 
 export type Theme = 'ocean' | 'coral' | 'deep-sea';
+export type FontFamily = 'sans' | 'serif' | 'mono';
+export type LayoutDensity = 'comfortable' | 'cozy' | 'compact';
 
 interface SettingsContextType {
   temperatureUnit: 'C' | 'F';
   isDarkMode: boolean;
   theme: Theme;
+  fontFamily: FontFamily;
+  fontSize: number; // as percentage, e.g. 100
+  layoutDensity: LayoutDensity;
   refreshInterval: number;
   autoRefresh: boolean;
-  cameraStreamUrl: string; // Added
+  cameraStreamUrl: string;
   setTemperatureUnit: (unit: 'C' | 'F') => void;
   setIsDarkMode: (isDark: boolean) => void;
   setTheme: (theme: Theme) => void;
+  setFontFamily: (font: FontFamily) => void;
+  setFontSize: (size: number) => void;
+  setLayoutDensity: (density: LayoutDensity) => void;
   setRefreshInterval: (interval: number) => void;
   setAutoRefresh: (auto: boolean) => void;
-  setCameraStreamUrl: (url: string) => void; // Added
+  setCameraStreamUrl: (url: string) => void;
   rebootSystem: () => void;
   factoryReset: () => void;
 }
@@ -39,12 +47,14 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [temperatureUnit, setTemperatureUnitState] = useState<'C' | 'F'>('C');
   const [isDarkMode, setIsDarkModeState] = useState(false);
   const [theme, setThemeState] = useState<Theme>('ocean');
+  const [fontFamily, setFontFamilyState] = useState<FontFamily>('sans');
+  const [fontSize, setFontSizeState] = useState(100);
+  const [layoutDensity, setLayoutDensityState] = useState<LayoutDensity>('comfortable');
   const [refreshInterval, setRefreshIntervalState] = useState(10);
   const [autoRefresh, setAutoRefreshState] = useState(true);
-  const [cameraStreamUrl, setCameraStreamUrlState] = useState<string>(defaultSecurityConfig.cameraStreamUrl); // Added state for cameraStreamUrl
+  const [cameraStreamUrl, setCameraStreamUrlState] = useState<string>(defaultSecurityConfig.cameraStreamUrl);
   const { toast } = useToast();
 
-  // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem('neptuneOS-settings');
     if (savedSettings) {
@@ -53,42 +63,50 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         setTemperatureUnitState(settings.temperatureUnit || 'C');
         setIsDarkModeState(settings.isDarkMode || false);
         setThemeState(settings.theme || 'ocean');
+        setFontFamilyState(settings.fontFamily || 'sans');
+        setFontSizeState(settings.fontSize || 100);
+        setLayoutDensityState(settings.layoutDensity || 'comfortable');
         setRefreshIntervalState(settings.refreshInterval || 10);
         setAutoRefreshState(settings.autoRefresh !== undefined ? settings.autoRefresh : true);
-        setCameraStreamUrlState(settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl); // Load cameraStreamUrl
+        setCameraStreamUrlState(settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl);
       } catch (error) {
         console.log('Error loading settings from localStorage:', error);
-        // Fallback to defaults if parsing fails or specific keys are missing
+        setFontFamilyState('sans');
+        setFontSizeState(100);
+        setLayoutDensityState('comfortable');
         setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl);
       }
     }
   }, []);
 
-  // Apply dark mode and theme to document
   useEffect(() => {
     const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    // Apply theme
+    root.classList.toggle('dark', isDarkMode);
     root.classList.remove('theme-ocean', 'theme-coral', 'theme-deep-sea');
     root.classList.add(`theme-${theme}`);
-  }, [isDarkMode, theme]);
+    root.classList.remove('font-family-serif', 'font-family-mono');
+    if (fontFamily === 'serif') root.classList.add('font-family-serif');
+    if (fontFamily === 'mono') root.classList.add('font-family-mono');
+    root.style.setProperty('--font-scale', `${fontSize / 100}`);
+    root.classList.remove('density-cozy', 'density-compact');
+    if (layoutDensity === 'cozy') root.classList.add('density-cozy');
+    if (layoutDensity === 'compact') root.classList.add('density-compact');
+  }, [isDarkMode, theme, fontFamily, fontSize, layoutDensity]);
 
-  // Save settings to localStorage whenever they change
   useEffect(() => {
     const settings = {
       temperatureUnit,
       isDarkMode,
       theme,
+      fontFamily,
+      fontSize,
+      layoutDensity,
       refreshInterval,
       autoRefresh,
-      cameraStreamUrl // Save cameraStreamUrl
+      cameraStreamUrl,
     };
     localStorage.setItem('neptuneOS-settings', JSON.stringify(settings));
-  }, [temperatureUnit, isDarkMode, theme, refreshInterval, autoRefresh, cameraStreamUrl]);
+  }, [temperatureUnit, isDarkMode, theme, fontFamily, fontSize, layoutDensity, refreshInterval, autoRefresh, cameraStreamUrl]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setTemperatureUnitState(unit);
@@ -114,6 +132,30 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     });
   };
 
+  const setFontFamily = (font: FontFamily) => {
+    setFontFamilyState(font);
+    toast({
+      title: "Font Changed",
+      description: `UI font set to ${font.charAt(0).toUpperCase() + font.slice(1)}`,
+    });
+  };
+
+  const setFontSize = (size: number) => {
+    setFontSizeState(size);
+    toast({
+      title: "Font Size Updated",
+      description: `Base font size set to ${size}%`,
+    });
+  };
+
+  const setLayoutDensity = (density: LayoutDensity) => {
+    setLayoutDensityState(density);
+    toast({
+      title: "Layout Density Changed",
+      description: `Layout density set to ${density.charAt(0).toUpperCase() + density.slice(1)}`,
+    });
+  };
+
   const setRefreshInterval = (interval: number) => {
     setRefreshIntervalState(interval);
     toast({
@@ -130,7 +172,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     });
   };
 
-  const setCameraStreamUrl = (url: string) => { // Added function to set cameraStreamUrl
+  const setCameraStreamUrl = (url: string) => {
     if (validateNetworkEndpoint(url)) {
       setCameraStreamUrlState(url);
       toast({
@@ -156,14 +198,16 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 
   const factoryReset = () => {
     console.log('Factory reset initiated...');
-    // Reset settings to defaults
     setTemperatureUnitState('C');
     setIsDarkModeState(false);
     setThemeState('ocean');
+    setFontFamilyState('sans');
+    setFontSizeState(100);
+    setLayoutDensityState('comfortable');
     setRefreshIntervalState(10);
     setAutoRefreshState(true);
-    setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl); // Reset cameraStreamUrl
-    localStorage.removeItem('neptuneOS-settings'); // This will cause useEffect to save new defaults on next render.
+    setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl);
+    localStorage.removeItem('neptuneOS-settings');
     toast({
       title: "Factory Reset Complete",
       description: "All settings have been reset to defaults.",
@@ -175,15 +219,21 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       temperatureUnit,
       isDarkMode,
       theme,
+      fontFamily,
+      fontSize,
+      layoutDensity,
       refreshInterval,
       autoRefresh,
-      cameraStreamUrl, // Provide cameraStreamUrl
+      cameraStreamUrl,
       setTemperatureUnit,
       setIsDarkMode,
       setTheme,
+      setFontFamily,
+      setFontSize,
+      setLayoutDensity,
       setRefreshInterval,
       setAutoRefresh,
-      setCameraStreamUrl, // Provide setCameraStreamUrl
+      setCameraStreamUrl,
       rebootSystem,
       factoryReset
     }}>
