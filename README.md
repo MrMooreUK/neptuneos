@@ -1,3 +1,4 @@
+
 # 🌊 NeptuneOS - Aquarium Monitoring System
 
 <div align="center">
@@ -27,9 +28,10 @@ NeptuneOS is a sophisticated aquarium monitoring system that provides real-time 
 - **Average Calculation** - Automatic averaging of sensor readings
 
 ### 📹 Live Camera Feed
-- **HD Video Stream** - High-definition live camera feed display
+- **HD Video Stream** - High-definition live camera feed display via mjpg-streamer
 - **Responsive Layout** - Adapts to different screen sizes
 - **Status Indicators** - Connection status and feed quality badges
+- **Auto-configuration** - Works with USB cameras and Raspberry Pi camera module
 
 ### 🎨 Customizable Interface
 - **Dark/Light Mode** - Toggle between themes for comfortable viewing
@@ -42,19 +44,33 @@ NeptuneOS is a sophisticated aquarium monitoring system that provides real-time 
 - **System Information** - CPU, memory, storage, and uptime tracking
 - **Backup & Recovery** - Export/import system configurations
 - **System Controls** - Reboot and factory reset functionality
+- **Service Management** - PM2 and systemd service monitoring
 
-### 🔒 Future Features (Coming Soon)
-- **Lighting Control** - Automated lighting schedules
-- **Filtration Management** - Filter monitoring and control
-- **Feeding Automation** - Scheduled feeding system
+### 🔒 Security Features
+- **Secure Communication** - HTTPS/WSS protocols ready
+- **Access Logging** - Security event tracking
+- **Safe Repository Management** - Git permission handling
 
-## 🚀 Getting Started & Documentation
+## 🚀 Quick Start
 
-NeptuneOS is designed for easy deployment on a Raspberry Pi as a dedicated monitoring appliance. For detailed instructions on installation, hardware setup, development, and deployment, please refer to our comprehensive setup guide:
+### Automated Installation (Recommended)
+For Raspberry Pi deployment:
 
-➡️ **[Full Setup & Deployment Guide (SETUP.md)](./SETUP.md)**
+```bash
+git clone https://github.com/YOUR_USERNAME/neptuneos.git
+cd neptuneos
+sudo bash deploy/install.sh
+```
 
-This guide contains everything you need, from automated installation to manual setup and troubleshooting.
+### Local Development
+```bash
+git clone https://github.com/YOUR_USERNAME/neptuneos.git
+cd neptuneos
+npm install
+npm run dev
+```
+
+For detailed setup instructions, see **[SETUP.md](./SETUP.md)**
 
 ## 🛠️ Tech Stack
 
@@ -69,42 +85,39 @@ This guide contains everything you need, from automated installation to manual s
 | 🧭 **React Router** | Navigation | 6.26.2 |
 | 📊 **Recharts** | Data Visualization | 2.12.7 |
 | 🎯 **Lucide React** | Icons | 0.462.0 |
+| 🖥️ **Express.js** | Backend API | 4.21.2 |
+| 🎥 **mjpg-streamer** | Camera Streaming | Latest |
+| 🔄 **PM2** | Process Management | Latest |
+| 🌐 **Nginx** | Web Server & Proxy | Latest |
 
 ## 📁 Project Structure
 
 ```
-src/
-├── 📱 components/
-│   ├── 🎛️ settings/           # Settings page components
-│   │   ├── SettingsHeader.tsx
-│   │   ├── TemperatureSettingsCard.tsx
-│   │   ├── AppearanceSettingsCard.tsx
-│   │   ├── SystemInfoCard.tsx
-│   │   ├── NetworkSettingsCard.tsx
-│   │   ├── BackupRecoveryCard.tsx
-│   │   └── SystemControlsCard.tsx
-│   └── 🎨 ui/                 # Reusable UI components
-├── 🌐 contexts/
-│   └── SettingsContext.tsx    # Global settings state
-├── 🪝 hooks/
-│   └── use-toast.ts          # Toast notifications
-├── 📄 pages/
-│   ├── Index.tsx             # Main dashboard
-│   ├── Settings.tsx          # Settings page
-│   └── NotFound.tsx          # 404 page
-├── 🛠️ utils/
-│   └── temperature.ts        # Temperature utilities
-└── 🎯 lib/
-    └── utils.ts              # General utilities
+├── 📱 src/
+│   ├── components/
+│   │   ├── dashboard/          # Main dashboard components
+│   │   ├── settings/           # Settings page components
+│   │   └── ui/                 # Reusable UI components
+│   ├── contexts/               # React contexts
+│   ├── hooks/                  # Custom React hooks
+│   ├── pages/                  # Route components
+│   ├── utils/                  # Utility functions
+│   └── lib/                    # Core libraries
+├── 🚀 deploy/
+│   ├── install.sh              # Automated installer
+│   ├── api-server.cjs          # Backend API server
+│   ├── nginx.conf              # Web server configuration
+│   └── ecosystem.config.cjs    # PM2 configuration
+└── 📖 docs/
+    ├── SETUP.md                # Setup & deployment guide
+    ├── FEATURES.md             # Feature documentation
+    └── CONTRIBUTING.md         # Contribution guidelines
 ```
 
 ## 🎯 API Integration
 
-The app connects to a backend API for sensor data and a camera for a live video feed. These endpoints are configured to work seamlessly with the Raspberry Pi deployment. For more details, see the [deployment section in our setup guide](./SETUP.md).
-
 ### Temperature API
 ```typescript
-// Expected API endpoint: /api/temperature
 interface TemperatureData {
   sensor1: number;    // °C
   sensor2: number;    // °C
@@ -113,90 +126,75 @@ interface TemperatureData {
 }
 ```
 
-### Camera Feed
-- Expected video stream endpoint for live feed integration
-- Placeholder displayed when camera is disconnected
+### System Information API
+```typescript
+interface SystemInfo {
+  uptime: string;
+  cpu: number;      // Usage percentage
+  memory: number;   // Usage percentage
+  storage: number;  // Usage percentage
+  network: string;  // IP address
+}
+```
 
 ## ⚙️ Configuration
 
 ### Environment Variables
-Create a `.env` file for custom configuration:
-
 ```env
 # API Configuration
-VITE_API_BASE_URL=http://your-aquarium-device.local
-VITE_CAMERA_STREAM_URL=http://your-camera-device.local/stream
+VITE_API_BASE_URL=http://localhost:3001
+VITE_CAMERA_STREAM_URL=http://localhost:8080/?action=stream
 
 # Feature Flags
 VITE_ENABLE_CAMERA=true
 VITE_ENABLE_FUTURE_FEATURES=false
 ```
 
-### Default Settings
-- **Temperature Unit**: Celsius
-- **Refresh Interval**: 30 seconds
-- **Auto Refresh**: Enabled
-- **Theme**: Light mode
-- **Temperature Thresholds**:
-  - ❄️ Too Cold: < 24°C
-  - ✅ Optimal: 24°C - 28°C
-  - 🔥 Too Hot: > 28°C
+### Hardware Configuration
+- **Temperature Sensors**: DS18B20 on GPIO 4 with 4.7kΩ pull-up
+- **Camera**: USB camera or Raspberry Pi camera module
+- **Network**: Ethernet or WiFi connectivity
 
-## 🎨 Theming
+## 🚀 Deployment Architecture
 
-NeptuneOS uses a comprehensive design system with aquatic-inspired colors:
+NeptuneOS uses a multi-service architecture:
 
-### Color Palette
-- 🌊 **Ocean Blue**: Primary brand color
-- 🏝️ **Seafoam**: Secondary accent
-- 🐚 **Light Aqua**: Subtle backgrounds
-- 🪸 **Coral**: Warning and accent colors
-- 🌊 **Wave Blue**: Light backgrounds
+1. **Frontend**: React app served by Nginx
+2. **Backend API**: Express.js server managed by PM2
+3. **Camera Stream**: mjpg-streamer systemd service
+4. **Reverse Proxy**: Nginx routing all services
 
-### Dark Mode
-- Automatically adjusts all colors for comfortable night viewing
-- Preserves color relationships and accessibility
-- Smooth transitions between themes
+All services auto-start on boot and include health monitoring.
 
 ## 📱 Responsive Design
 
-NeptuneOS is fully responsive and optimized for:
-
 - 🖥️ **Desktop** (1024px+): Full dashboard layout
-- 📱 **Tablet** (768px+): Optimized grid layout
+- 📱 **Tablet** (768px+): Optimized grid layout  
 - 📱 **Mobile** (320px+): Stacked layout with touch-friendly controls
-
-## 🚀 Deployment
-
-All deployment instructions have been consolidated into our comprehensive [Setup Guide](./SETUP.md).
 
 ## 🤝 Contributing
 
-We welcome contributions! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
-
-Please read our **[CONTRIBUTING.md](./CONTRIBUTING.md)** guide for detailed instructions on how to get started, our development workflow, and coding standards.
+We welcome contributions! See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for guidelines.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🆘 Support
 
-- 📚 [Lovable Documentation](https://docs.lovable.dev/)
+- 📚 [Setup Guide](./SETUP.md)
+- 🎯 [Feature Documentation](./FEATURES.md)
 - 💬 [Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
-- 🎥 [Video Tutorials](https://www.youtube.com/watch?v=9KHLTZaJcR8&list=PLbVHz4urQBZkJiAWdG8HWoJTdgEysigIO)
+- 📺 [Video Tutorials](https://www.youtube.com/watch?v=9KHLTZaJcR8&list=PLbVHz4urQBZkJiAWdG8HWoJTdgEysigIO)
 
 ## 🙏 Acknowledgments
 
 - Built with ❤️ using [Lovable](https://lovable.dev)
 - UI components by [shadcn/ui](https://ui.shadcn.com/)
 - Icons by [Lucide](https://lucide.dev/)
-- Design inspiration from modern aquarium monitoring systems
 
 ---
 
 <div align="center">
   <strong>🌊 Dive into the future of aquarium monitoring with NeptuneOS! 🐠</strong>
 </div>
-
-</initial_code>
