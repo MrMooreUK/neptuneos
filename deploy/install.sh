@@ -148,11 +148,18 @@ sudo chown -R $ACTUAL_USER:$ACTUAL_USER /home/$ACTUAL_USER/neptuneos
 # Reset any git permission issues for main repo
 cd /home/$ACTUAL_USER/neptuneos
 sudo -u $ACTUAL_USER git config --global --add safe.directory /home/$ACTUAL_USER/neptuneos
-# Fix mjpg-streamer git permissions too
+# Fix mjpg-streamer git permissions thoroughly
 if [ -d "mjpg-streamer" ]; then
     log_info "Fixing mjpg-streamer git repository permissions..."
     sudo chown -R $ACTUAL_USER:$ACTUAL_USER mjpg-streamer
+    # Specifically fix .git directory and all its contents
+    sudo find mjpg-streamer/.git -type f -exec sudo chown $ACTUAL_USER:$ACTUAL_USER {} \;
+    sudo find mjpg-streamer/.git -type d -exec sudo chown $ACTUAL_USER:$ACTUAL_USER {} \;
     sudo -u $ACTUAL_USER git config --global --add safe.directory /home/$ACTUAL_USER/neptuneos/mjpg-streamer
+    # Set git pull strategy to avoid merge warnings
+    cd mjpg-streamer
+    sudo -u $ACTUAL_USER git config pull.rebase false
+    cd ..
 fi
 log_success "Git repository permissions fixed."
 
