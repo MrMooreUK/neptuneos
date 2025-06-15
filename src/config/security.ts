@@ -9,7 +9,7 @@ export interface SecurityConfig {
 }
 
 export const defaultSecurityConfig: SecurityConfig = {
-  cameraStreamUrl: 'http://192.168.10.148:5000/',
+  cameraStreamUrl: '/stream', // Use relative path for nginx proxy
   apiBaseUrl: '/api',
   enableSecurityLogging: true,
   connectionTimeout: 5000,
@@ -17,6 +17,10 @@ export const defaultSecurityConfig: SecurityConfig = {
 };
 
 export const validateNetworkEndpoint = (url: string): boolean => {
+  // Allow relative paths starting with /
+  if (url.startsWith('/')) {
+    return true;
+  }
   try {
     const urlObj = new URL(url);
     // Allow local network ranges for aquarium monitoring

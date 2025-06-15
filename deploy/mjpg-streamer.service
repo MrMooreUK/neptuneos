@@ -1,0 +1,15 @@
+
+[Unit]
+Description=MJPG-Streamer - Camera Streaming Server
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/neptuneos/mjpg-streamer/mjpg-streamer-experimental
+ExecStart=/usr/local/bin/mjpg_streamer -i "input_uvc.so -d /dev/video0 -r 1280x720 -f 30" -o "output_http.so -p 8080 -w ./www"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
