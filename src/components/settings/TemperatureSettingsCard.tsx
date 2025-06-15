@@ -30,25 +30,27 @@ const TemperatureSettingsCard = () => {
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Temperature Unit</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">Choose between Celsius and Fahrenheit</p>
           </div>
-          <div className="flex items-center space-x-3 min-w-fit">
-            <span className={`text-sm font-medium min-w-[24px] text-center ${temperatureUnit === 'C' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°C</span>
+          <div className="flex items-center space-x-3">
+            <span className={`text-sm font-medium w-6 text-center ${temperatureUnit === 'C' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°C</span>
             <Switch 
               checked={temperatureUnit === 'F'} 
               onCheckedChange={(checked) => setTemperatureUnit(checked ? 'F' : 'C')}
             />
-            <span className={`text-sm font-medium min-w-[24px] text-center ${temperatureUnit === 'F' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°F</span>
+            <span className={`text-sm font-medium w-6 text-center ${temperatureUnit === 'F' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>°F</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex-1 pr-4">
             <h3 className="font-medium text-gray-900 dark:text-gray-100">Auto Refresh</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">Automatically update temperature readings</p>
           </div>
-          <Switch 
-            checked={autoRefresh} 
-            onCheckedChange={setAutoRefresh}
-          />
+          <div className="flex items-center justify-center w-[7.25rem]">
+            <Switch 
+              checked={autoRefresh} 
+              onCheckedChange={setAutoRefresh}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
