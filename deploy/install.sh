@@ -35,6 +35,10 @@ trap 'handle_error $LINENO' ERR
 # --- Start of Installation ---
 log_info "🌊 Starting NeptuneOS Installation... Log will be saved to $LOG_FILE"
 
+# Get the actual user (not root even when running with sudo)
+ACTUAL_USER=${SUDO_USER:-$(logname)}
+log_info "Detected user: $ACTUAL_USER"
+
 # --- Update System ---
 log_info "🔄 Updating package lists..."
 sudo apt-get update -y
@@ -69,11 +73,12 @@ log_success "PM2 is ready."
 
 # --- Frontend Setup ---
 log_info "🏗️ Building the frontend... (This may take a few minutes)"
-# NOTE: These commands are run as root because the script is executed with sudo.
-# This might cause permission issues if you later run npm commands as a non-root user.
-# If that happens, you may need to fix permissions with: sudo chown -R $(logname):$(logname) .
+# Run npm commands and fix permissions afterward
 npm install
 npm run build
+# Fix file permissions to prevent git pull issues
+log_info "Fixing file permissions for git operations..."
+sudo chown -R $ACTUAL_USER:$ACTUAL_USER node_modules package-lock.json dist 2>/dev/null || true
 log_success "Frontend built successfully."
 
 # --- Backend Setup ---
@@ -81,15 +86,16 @@ log_info "⚙️ Setting up backend dependencies..."
 cd deploy
 log_info "Installing backend dependencies (express, cors)..."
 npm install
+# Fix permissions for backend dependencies too
+sudo chown -R $ACTUAL_USER:$ACTUAL_USER node_modules package-lock.json 2>/dev/null || true
 cd ..
 log_success "Backend dependencies installed."
 
 # --- Backend Setup (with PM2) ---
 log_info "⚙️ Starting the backend API server with PM2..."
 pm2 start deploy/ecosystem.config.cjs
-CURRENT_USER=$(logname)
-log_info "Creating PM2 startup script to run on boot for user: $CURRENT_USER..."
-sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $CURRENT_USER --hp /home/$CURRENT_USER
+log_info "Creating PM2 startup script to run on boot for user: $ACTUAL_USER..."
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $ACTUAL_USER --hp /home/$ACTUAL_USER
 pm2 save
 log_success "Backend API server configured."
 
@@ -123,21 +129,34 @@ if [ ! -d "mjpg-streamer" ]; then
     git clone https://github.com/jacksonliam/mjpg-streamer.git
     log_info "Building and installing mjpg-streamer..."
     (cd mjpg-streamer/mjpg-streamer-experimental && make && sudo make install)
+    # Fix ownership of cloned directory
+    sudo chown -R $ACTUAL_USER:$ACTUAL_USER mjpg-streamer
 else
     log_info "mjpg-streamer directory already exists. Skipping clone and build."
 fi
-log_info "Setting up systemd service for the camera..."
+log_info "Setting up systemd service for the camera with optimized resolution..."
 sudo cp deploy/mjpg-streamer.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable mjpg-streamer.service
 sudo systemctl start mjpg-streamer.service
-log_success "Camera streaming service configured."
+log_success "Camera streaming service configured with 640x480 resolution."
+
+# --- Fix Git Repository Permissions ---
+log_info "🔧 Fixing git repository permissions..."
+# Ensure all files in the project are owned by the actual user
+sudo chown -R $ACTUAL_USER:$ACTUAL_USER /home/$ACTUAL_USER/neptuneos
+# Reset any git permission issues
+cd /home/$ACTUAL_USER/neptuneos
+sudo -u $ACTUAL_USER git config --global --add safe.directory /home/$ACTUAL_USER/neptuneos
+log_success "Git repository permissions fixed."
 
 # --- Finalization ---
 trap - ERR # Disable the error trap for the final success message
 log_success "🎉 Installation Complete!"
 echo -e "\n✅ NeptuneOS should be accessible at http://neptuneos.local/"
-echo "A full log is available at: $LOG_FILE"
+echo "🎥 Camera stream should be available at http://neptuneos.local:8080"
+echo "📁 A full log is available at: $LOG_FILE"
+echo -e "\n💡 Git operations should now work properly as user $ACTUAL_USER"
 log_info "Rebooting in 10 seconds to apply all changes..."
 sleep 10
 sudo reboot
