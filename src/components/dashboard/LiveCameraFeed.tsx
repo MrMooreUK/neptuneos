@@ -1,48 +1,80 @@
 
-import { Camera, WifiOff } from 'lucide-react';
+import { Camera, WifiOff, Play } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSettings } from '@/contexts/SettingsContext'; // Import useSettings
-import { useSecureConnection } from '@/hooks/useSecureConnection'; // Import useSecureConnection
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { useSettings } from '@/contexts/SettingsContext';
+import { useSecureConnection } from '@/hooks/useSecureConnection';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const LiveCameraFeed = () => {
-  const { cameraStreamUrl } = useSettings(); // Get cameraStreamUrl from context
-  const { isConnected, lastError } = useSecureConnection(cameraStreamUrl); // Check connection to the dynamic URL
+  const { cameraStreamUrl } = useSettings();
+  const { isConnected, lastError } = useSecureConnection(cameraStreamUrl);
 
   return (
-    <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg border-cyan-100 dark:border-slate-700 overflow-hidden">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-cyan-700 dark:text-cyan-400">
-          <Camera className="w-6 h-6" />
-          <span>Live Camera Feed</span>
+    <Card className="group hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-cyan-50/80 to-blue-50/80 dark:from-slate-800/80 dark:to-cyan-900/50 backdrop-blur-sm border border-cyan-200/50 dark:border-cyan-600/30 overflow-hidden h-fit">
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <CardHeader className="pb-4 relative z-10">
+        <CardTitle className="text-xl font-bold flex items-center space-x-3">
+          <div className="p-2 bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900/50 dark:to-blue-900/30 rounded-xl">
+            <Camera className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+          </div>
+          <div>
+            <span className="text-gray-900 dark:text-gray-100">Live Camera Feed</span>
+            <div className="flex items-center mt-1">
+              <div className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {isConnected ? 'Live' : 'Offline'}
+              </span>
+            </div>
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="aspect-video bg-gray-200 dark:bg-slate-700 rounded-lg overflow-hidden flex items-center justify-center">
+      <CardContent className="relative z-10">
+        <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 rounded-xl overflow-hidden shadow-inner border border-gray-200/50 dark:border-slate-600/50 relative group/video">
           {isConnected ? (
-            <img 
-              src={cameraStreamUrl} 
-              alt="Live aquarium feed" 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // This is a simple way to show an error message if the image fails to load
-                // e.g., if the stream URL is valid but the stream itself is down or returns non-image content
-                // For more robust handling, we might replace the img with a message.
-                console.error("Camera stream error:", e);
-                (e.target as HTMLImageElement).style.display = 'none'; 
-                // Optionally, show a placeholder or error message here
-                // For now, if image errors, it will show the parent div's background
-              }}
-            />
+            <>
+              <img 
+                src={cameraStreamUrl} 
+                alt="Live aquarium feed" 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover/video:scale-105"
+                onError={(e) => {
+                  console.error("Camera stream error:", e);
+                  (e.target as HTMLImageElement).style.display = 'none'; 
+                }}
+              />
+              <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span>LIVE</span>
+              </div>
+            </>
           ) : (
-            <div className="text-center text-gray-500 dark:text-gray-400 p-4">
-              <WifiOff className="w-12 h-12 mx-auto mb-2 text-red-500" />
-              <p className="font-semibold">Camera Offline</p>
-              {lastError && <p className="text-xs mt-1">Error: {lastError}</p>}
-              {!cameraStreamUrl && <p className="text-xs mt-1">Camera URL not configured.</p>}
-              {cameraStreamUrl && !lastError && <Skeleton className="w-full h-full" />} {/* Show skeleton while trying to connect if no error yet */}
+            <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 p-6">
+              <div className="relative mb-4">
+                <div className="p-6 bg-gray-200/50 dark:bg-slate-600/50 rounded-full">
+                  <WifiOff className="w-12 h-12 text-red-500" />
+                </div>
+                <div className="absolute inset-0 bg-red-500/10 rounded-full animate-ping"></div>
+              </div>
+              <p className="font-semibold text-lg mb-2">Camera Offline</p>
+              <p className="text-sm text-center opacity-75">
+                {lastError && `Error: ${lastError}`}
+                {!cameraStreamUrl && 'Camera URL not configured'}
+                {cameraStreamUrl && !lastError && 'Attempting to connect...'}
+              </p>
+              {cameraStreamUrl && !lastError && (
+                <div className="mt-4 flex items-center space-x-2 text-blue-500">
+                  <Play className="w-4 h-4" />
+                  <span className="text-sm">Connecting to stream...</span>
+                </div>
+              )}
             </div>
           )}
+        </div>
+        
+        {/* Stream Info */}
+        <div className="mt-4 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+          <span>Resolution: 1080p</span>
+          <span>FPS: 30</span>
+          <span>Quality: HD</span>
         </div>
       </CardContent>
     </Card>
@@ -50,4 +82,3 @@ const LiveCameraFeed = () => {
 };
 
 export default LiveCameraFeed;
-
