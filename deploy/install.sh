@@ -122,7 +122,7 @@ log_success "Camera streaming service configured."
 # --- Finalization ---
 trap - ERR # Disable the error trap for the final success message
 log_success "🎉 Installation Complete!"
-echo -e "\n✅ NeptuneOS should be accessible at http://<your-pi-ip>/"
+echo -e "\n✅ NeptuneOS should be accessible at http://neptuneos.local/"
 echo "A full log is available at: $LOG_FILE"
 log_info "Rebooting in 10 seconds to apply all changes..."
 sleep 10
