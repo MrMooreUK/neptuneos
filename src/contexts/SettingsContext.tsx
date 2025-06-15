@@ -1,15 +1,14 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security';
 
-export type Theme = 'ocean' | 'coral' | 'deep-sea';
 export type FontFamily = 'sans' | 'serif' | 'mono';
 export type LayoutDensity = 'comfortable' | 'cozy' | 'compact';
 
 interface SettingsContextType {
   temperatureUnit: 'C' | 'F';
   isDarkMode: boolean;
-  theme: Theme;
   fontFamily: FontFamily;
   fontSize: number; // as percentage, e.g. 100
   layoutDensity: LayoutDensity;
@@ -18,7 +17,6 @@ interface SettingsContextType {
   cameraStreamUrl: string;
   setTemperatureUnit: (unit: 'C' | 'F') => void;
   setIsDarkMode: (isDark: boolean) => void;
-  setTheme: (theme: Theme) => void;
   setFontFamily: (font: FontFamily) => void;
   setFontSize: (size: number) => void;
   setLayoutDensity: (density: LayoutDensity) => void;
@@ -46,7 +44,6 @@ interface SettingsProviderProps {
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
   const [temperatureUnit, setTemperatureUnitState] = useState<'C' | 'F'>('C');
   const [isDarkMode, setIsDarkModeState] = useState(false);
-  const [theme, setThemeState] = useState<Theme>('ocean');
   const [fontFamily, setFontFamilyState] = useState<FontFamily>('sans');
   const [fontSize, setFontSizeState] = useState(100);
   const [layoutDensity, setLayoutDensityState] = useState<LayoutDensity>('comfortable');
@@ -62,7 +59,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         const settings = JSON.parse(savedSettings);
         setTemperatureUnitState(settings.temperatureUnit || 'C');
         setIsDarkModeState(settings.isDarkMode || false);
-        setThemeState(settings.theme || 'ocean');
         setFontFamilyState(settings.fontFamily || 'sans');
         setFontSizeState(settings.fontSize || 100);
         setLayoutDensityState(settings.layoutDensity || 'comfortable');
@@ -82,8 +78,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle('dark', isDarkMode);
-    root.classList.remove('theme-ocean', 'theme-coral', 'theme-deep-sea');
-    root.classList.add(`theme-${theme}`);
     root.classList.remove('font-family-serif', 'font-family-mono');
     if (fontFamily === 'serif') root.classList.add('font-family-serif');
     if (fontFamily === 'mono') root.classList.add('font-family-mono');
@@ -91,13 +85,12 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     root.classList.remove('density-cozy', 'density-compact');
     if (layoutDensity === 'cozy') root.classList.add('density-cozy');
     if (layoutDensity === 'compact') root.classList.add('density-compact');
-  }, [isDarkMode, theme, fontFamily, fontSize, layoutDensity]);
+  }, [isDarkMode, fontFamily, fontSize, layoutDensity]);
 
   useEffect(() => {
     const settings = {
       temperatureUnit,
       isDarkMode,
-      theme,
       fontFamily,
       fontSize,
       layoutDensity,
@@ -106,7 +99,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       cameraStreamUrl,
     };
     localStorage.setItem('neptuneOS-settings', JSON.stringify(settings));
-  }, [temperatureUnit, isDarkMode, theme, fontFamily, fontSize, layoutDensity, refreshInterval, autoRefresh, cameraStreamUrl]);
+  }, [temperatureUnit, isDarkMode, fontFamily, fontSize, layoutDensity, refreshInterval, autoRefresh, cameraStreamUrl]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setTemperatureUnitState(unit);
@@ -121,14 +114,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     toast({
       title: "Theme Updated",
       description: `Switched to ${isDark ? 'dark' : 'light'} mode`,
-    });
-  };
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    toast({
-      title: "Theme Changed",
-      description: `Switched to ${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} theme`,
     });
   };
 
@@ -200,7 +185,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     console.log('Factory reset initiated...');
     setTemperatureUnitState('C');
     setIsDarkModeState(false);
-    setThemeState('ocean');
     setFontFamilyState('sans');
     setFontSizeState(100);
     setLayoutDensityState('comfortable');
@@ -218,7 +202,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     <SettingsContext.Provider value={{
       temperatureUnit,
       isDarkMode,
-      theme,
       fontFamily,
       fontSize,
       layoutDensity,
@@ -227,7 +210,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       cameraStreamUrl,
       setTemperatureUnit,
       setIsDarkMode,
-      setTheme,
       setFontFamily,
       setFontSize,
       setLayoutDensity,
