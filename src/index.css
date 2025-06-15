@@ -93,66 +93,59 @@
 }
 
 @layer base {
+  /* Theme System */
+  /* Ocean is the default, inherited from :root and .dark */
+
+  .theme-coral {
+    --primary: 14 91% 60%;
+    --primary-foreground: 20 100% 98%;
+    --secondary: 174 44% 51%; /* seafoam */
+    --ring: 14 91% 60%;
+    --background: 5 60% 97%;
+    --wave-blue: 5 60% 97%;
+  }
+  .dark .theme-coral {
+    --primary: 14 91% 70%;
+    --primary-foreground: 20 100% 10%;
+    --secondary: 174 44% 40%;
+    --ring: 14 91% 70%;
+    --background: 14 10% 8%;
+    --wave-blue: 14 10% 8%;
+    --card: 14 10% 11%;
+  }
+
+  /* Deep sea is dark by default, so light mode is a variation */
+  .theme-deep-sea {
+    --primary: 174 44% 40%;
+    --primary-foreground: 180 100% 98%;
+    --background: 206 50% 96%;
+    --card: 206 50% 100%;
+    --foreground: 210 40% 10%;
+    --secondary: 210 100% 55%;
+    --ring: 174 44% 40%;
+    --wave-blue: 206 50% 96%;
+  }
+  .dark .theme-deep-sea {
+    --primary: 174 44% 51%; /* seafoam */
+    --primary-foreground: 180 100% 98%;
+    --secondary: 210 100% 45%; /* ocean blue */
+    --ring: 174 44% 51%;
+    --background: 210 40% 5%;
+    --card: 210 40% 8%;
+    --foreground: 210 40% 95%;
+    --wave-blue: 210 40% 5%;
+  }
+}
+
+@layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen;
+    @apply bg-background text-foreground min-h-screen transition-colors duration-300;
     background: linear-gradient(135deg, hsl(var(--wave-blue)) 0%, hsl(var(--background)) 100%);
   }
 }
 
-@layer utilities {
-  .temp-cold {
-    @apply text-blue-500 bg-blue-50 dark:bg-blue-950;
-  }
-  
-  .temp-good {
-    @apply text-green-600 bg-green-50 dark:bg-green-950;
-  }
-  
-  .temp-hot {
-    @apply text-red-500 bg-red-50 dark:bg-red-950;
-  }
-
-  .wave-animation {
-    animation: wave 3s ease-in-out infinite;
-  }
-
-  .pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .aqua-glow {
-    box-shadow: 0 0 20px hsl(var(--seafoam) / 0.3);
-  }
-}
-
-@keyframes wave {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(2deg); }
-}
-
-@keyframes ripple {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.2); opacity: 0; }
-}
-
-.status-live {
-  @apply bg-green-500;
-  animation: pulse 2s infinite;
-}
-
-.status-offline {
-  @apply bg-red-500;
-}
-
-.card-hover {
-  transition: all 0.3s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
-}
+/* ... keep existing code */

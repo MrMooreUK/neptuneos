@@ -1,16 +1,19 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security'; // Added validateNetworkEndpoint and defaultSecurityConfig
 
+export type Theme = 'ocean' | 'coral' | 'deep-sea';
+
 interface SettingsContextType {
   temperatureUnit: 'C' | 'F';
   isDarkMode: boolean;
+  theme: Theme;
   refreshInterval: number;
   autoRefresh: boolean;
   cameraStreamUrl: string; // Added
   setTemperatureUnit: (unit: 'C' | 'F') => void;
   setIsDarkMode: (isDark: boolean) => void;
+  setTheme: (theme: Theme) => void;
   setRefreshInterval: (interval: number) => void;
   setAutoRefresh: (auto: boolean) => void;
   setCameraStreamUrl: (url: string) => void; // Added
@@ -35,6 +38,7 @@ interface SettingsProviderProps {
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
   const [temperatureUnit, setTemperatureUnitState] = useState<'C' | 'F'>('C');
   const [isDarkMode, setIsDarkModeState] = useState(false);
+  const [theme, setThemeState] = useState<Theme>('ocean');
   const [refreshInterval, setRefreshIntervalState] = useState(10);
   const [autoRefresh, setAutoRefreshState] = useState(true);
   const [cameraStreamUrl, setCameraStreamUrlState] = useState<string>(defaultSecurityConfig.cameraStreamUrl); // Added state for cameraStreamUrl
@@ -48,6 +52,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         const settings = JSON.parse(savedSettings);
         setTemperatureUnitState(settings.temperatureUnit || 'C');
         setIsDarkModeState(settings.isDarkMode || false);
+        setThemeState(settings.theme || 'ocean');
         setRefreshIntervalState(settings.refreshInterval || 10);
         setAutoRefreshState(settings.autoRefresh !== undefined ? settings.autoRefresh : true);
         setCameraStreamUrlState(settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl); // Load cameraStreamUrl
@@ -59,26 +64,31 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     }
   }, []);
 
-  // Apply dark mode to document
+  // Apply dark mode and theme to document
   useEffect(() => {
+    const root = document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
-  }, [isDarkMode]);
+    // Apply theme
+    root.classList.remove('theme-ocean', 'theme-coral', 'theme-deep-sea');
+    root.classList.add(`theme-${theme}`);
+  }, [isDarkMode, theme]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
     const settings = {
       temperatureUnit,
       isDarkMode,
+      theme,
       refreshInterval,
       autoRefresh,
       cameraStreamUrl // Save cameraStreamUrl
     };
     localStorage.setItem('neptuneOS-settings', JSON.stringify(settings));
-  }, [temperatureUnit, isDarkMode, refreshInterval, autoRefresh, cameraStreamUrl]);
+  }, [temperatureUnit, isDarkMode, theme, refreshInterval, autoRefresh, cameraStreamUrl]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setTemperatureUnitState(unit);
@@ -93,6 +103,14 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     toast({
       title: "Theme Updated",
       description: `Switched to ${isDark ? 'dark' : 'light'} mode`,
+    });
+  };
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    toast({
+      title: "Theme Changed",
+      description: `Switched to ${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} theme`,
     });
   };
 
@@ -141,6 +159,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     // Reset settings to defaults
     setTemperatureUnitState('C');
     setIsDarkModeState(false);
+    setThemeState('ocean');
     setRefreshIntervalState(10);
     setAutoRefreshState(true);
     setCameraStreamUrlState(defaultSecurityConfig.cameraStreamUrl); // Reset cameraStreamUrl
@@ -155,11 +174,13 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     <SettingsContext.Provider value={{
       temperatureUnit,
       isDarkMode,
+      theme,
       refreshInterval,
       autoRefresh,
       cameraStreamUrl, // Provide cameraStreamUrl
       setTemperatureUnit,
       setIsDarkMode,
+      setTheme,
       setRefreshInterval,
       setAutoRefresh,
       setCameraStreamUrl, // Provide setCameraStreamUrl
@@ -170,4 +191,3 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     </SettingsContext.Provider>
   );
 };
-
