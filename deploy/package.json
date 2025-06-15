@@ -1,0 +1,15 @@
+
+{
+  "name": "neptuneos-backend",
+  "version": "1.0.0",
+  "description": "NeptuneOS Backend API Server",
+  "main": "api-server.cjs",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node api-server.cjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5"
+  }
+}
