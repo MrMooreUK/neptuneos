@@ -1,4 +1,5 @@
 
+import React, { useState } from 'react';
 import { Power, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,18 @@ import { useSettings } from '@/contexts/SettingsContext';
 
 const SystemControlsCard = () => {
   const { rebootSystem, factoryReset } = useSettings();
+  const [rebootDialogOpen, setRebootDialogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+  const handleReboot = () => {
+    rebootSystem();
+    setRebootDialogOpen(false);
+  };
+
+  const handleReset = () => {
+    factoryReset();
+    setResetDialogOpen(false);
+  };
 
   return (
     <Card className="card-hover bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-red-200 dark:border-red-600 lg:col-span-2">
@@ -26,7 +39,7 @@ const SystemControlsCard = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Dialog>
+          <Dialog open={rebootDialogOpen} onOpenChange={setRebootDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center space-x-2">
                 <RotateCcw className="w-4 h-4" />
@@ -41,13 +54,13 @@ const SystemControlsCard = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline">Cancel</Button>
-                <Button variant="destructive" onClick={rebootSystem}>Reboot Now</Button>
+                <Button variant="outline" onClick={() => setRebootDialogOpen(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={handleReboot}>Reboot Now</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          <Dialog>
+          <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="destructive" className="flex items-center space-x-2">
                 <Power className="w-4 h-4" />
@@ -62,8 +75,8 @@ const SystemControlsCard = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline">Cancel</Button>
-                <Button variant="destructive" onClick={factoryReset}>Reset Now</Button>
+                <Button variant="outline" onClick={() => setResetDialogOpen(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={handleReset}>Reset Now</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
