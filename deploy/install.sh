@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # NeptuneOS Automated Installer for Raspberry Pi
@@ -36,13 +35,16 @@ trap 'handle_error $LINENO' ERR
 log_info "🌊 Starting NeptuneOS Installation... Log will be saved to $LOG_FILE"
 
 # --- Update System ---
-log_info "🔄 Updating package lists and upgrading system..."
+log_info "🔄 Updating package lists..."
 sudo apt-get update -y
+log_success "Package lists updated."
+
+log_info "🚀 Upgrading system packages. This is the longest step and may take several minutes..."
 sudo apt-get upgrade -y
 log_success "System updated."
 
 # --- Install Dependencies ---
-log_info "📦 Installing core dependencies (git, nginx, nodejs, npm, cmake)..."
+log_info "📦 Installing core dependencies (git, nginx, cmake, libjpeg-dev)..."
 sudo apt-get install -y git nginx cmake libjpeg-dev
 
 # Install Node.js and npm if not present
@@ -76,8 +78,9 @@ log_success "Frontend built successfully."
 # --- Backend Setup (with PM2) ---
 log_info "⚙️ Setting up the backend API server with PM2..."
 pm2 start deploy/ecosystem.config.js
-log_info "Creating PM2 startup script to run on boot..."
-sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u pi --hp /home/pi
+CURRENT_USER=$(logname)
+log_info "Creating PM2 startup script to run on boot for user: $CURRENT_USER..."
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $CURRENT_USER --hp /home/$CURRENT_USER
 pm2 save
 log_success "Backend API server configured."
 
@@ -124,4 +127,3 @@ echo "A full log is available at: $LOG_FILE"
 log_info "Rebooting in 10 seconds to apply all changes..."
 sleep 10
 sudo reboot
-
