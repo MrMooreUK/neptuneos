@@ -84,12 +84,35 @@ log_success "Frontend built successfully."
 # --- Backend Setup ---
 log_info "⚙️ Setting up backend dependencies..."
 cd deploy
-log_info "Installing backend dependencies (express, cors)..."
+log_info "Installing backend dependencies (express, cors, sqlite3, bcrypt, jsonwebtoken)..."
 npm install
 # Fix permissions for backend dependencies too
 sudo chown -R $ACTUAL_USER:$ACTUAL_USER node_modules package-lock.json 2>/dev/null || true
+
+# --- Database Setup ---
+log_info "🗄️ Setting up SQLite database..."
+# Create database directory if it doesn't exist
+mkdir -p data
+# Initialize database (this will create the database and tables if they don't exist)
+node -e "
+const Database = require('./database.cjs');
+const db = new Database();
+console.log('Database initialized successfully');
+process.exit(0);
+" || log_error "Database initialization failed"
+
+# Set proper permissions for database directory and files
+sudo chown -R $ACTUAL_USER:$ACTUAL_USER data 2>/dev/null || true
+chmod 755 data
+if [ -f "data/neptuneos.db" ]; then
+    chmod 644 data/neptuneos.db
+    log_success "Database setup completed."
+else
+    log_info "Database will be created on first run."
+fi
+
 cd ..
-log_success "Backend dependencies installed."
+log_success "Backend dependencies and database setup completed."
 
 # --- Backend Setup (with PM2) ---
 log_info "⚙️ Starting the backend API server with PM2..."
@@ -168,6 +191,7 @@ trap - ERR # Disable the error trap for the final success message
 log_success "🎉 Installation Complete!"
 echo -e "\n✅ NeptuneOS should be accessible at http://neptuneos.local/"
 echo "🎥 Camera stream should be available at http://neptuneos.local:8080"
+echo "🗄️ SQLite database initialized and ready"
 echo "📁 A full log is available at: $LOG_FILE"
 echo -e "\n💡 Git operations should now work properly as user $ACTUAL_USER"
 log_info "Rebooting in 10 seconds to apply all changes..."
