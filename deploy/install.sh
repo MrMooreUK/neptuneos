@@ -145,9 +145,15 @@ log_success "Camera streaming service configured with 640x480 resolution."
 log_info "🔧 Fixing git repository permissions..."
 # Ensure all files in the project are owned by the actual user
 sudo chown -R $ACTUAL_USER:$ACTUAL_USER /home/$ACTUAL_USER/neptuneos
-# Reset any git permission issues
+# Reset any git permission issues for main repo
 cd /home/$ACTUAL_USER/neptuneos
 sudo -u $ACTUAL_USER git config --global --add safe.directory /home/$ACTUAL_USER/neptuneos
+# Fix mjpg-streamer git permissions too
+if [ -d "mjpg-streamer" ]; then
+    log_info "Fixing mjpg-streamer git repository permissions..."
+    sudo chown -R $ACTUAL_USER:$ACTUAL_USER mjpg-streamer
+    sudo -u $ACTUAL_USER git config --global --add safe.directory /home/$ACTUAL_USER/neptuneos/mjpg-streamer
+fi
 log_success "Git repository permissions fixed."
 
 # --- Finalization ---
