@@ -9,7 +9,7 @@ export interface SecurityConfig {
 }
 
 export const defaultSecurityConfig: SecurityConfig = {
-  cameraStreamUrl: '/stream', // Use relative path for nginx proxy
+  cameraStreamUrl: '/stream', // Use nginx proxy path
   apiBaseUrl: '/api',
   enableSecurityLogging: true,
   connectionTimeout: 5000,
