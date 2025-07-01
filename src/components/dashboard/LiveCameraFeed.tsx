@@ -1,195 +1,163 @@
-import { Camera, WifiOff, Play, Maximize, Smartphone, Video, Eye, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useSettings } from '@/contexts/SettingsContext';
-import { useSecureConnection } from '@/hooks/useSecureConnection';
 import { useState } from 'react';
-import { useCameraStream } from '@/hooks/useCameraStream';
-import CameraDisplay from './CameraDisplay';
-import CameraFullscreenOverlay from './CameraFullscreenOverlay';
+import { Camera, AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const LiveCameraFeed = () => {
-  const { cameraStreamUrl } = useSettings();
-  const { isConnected, lastError } = useSecureConnection(cameraStreamUrl);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   
-  const streamUrl = cameraStreamUrl ? `${cameraStreamUrl}?t=${Date.now()}` : '';
-  const {
-    imageLoaded,
-    imageError,
-    retryCount,
-    imgRef,
-    handleImageLoad,
-    handleImageError,
-    forceRefresh,
-    isMobile
-  } = useCameraStream(streamUrl);
+  const cameraUrl = 'http://localhost:8080/?action=stream';
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+  const handleImageLoad = () => {
+    setIsLoading(false);
+    setHasError(false);
+    setIsConnected(true);
   };
 
-  const isStreamActive = isConnected && imageLoaded && !imageError;
+  const handleImageError = () => {
+    setIsLoading(false);
+    setHasError(true);
+    setIsConnected(false);
+  };
+
+  const handleRetry = () => {
+    setIsLoading(true);
+    setHasError(false);
+    // Force reload by changing the key
+    const img = document.querySelector('#camera-stream') as HTMLImageElement;
+    if (img) {
+      img.src = `${cameraUrl}?t=${Date.now()}`;
+    }
+  };
 
   return (
-    <>
-      {/* Professional Camera Feed Interface */}
-      <div className={`relative ${isFullscreen ? 'hidden' : ''}`}>
-        {/* Stream Status Bar */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800/50 dark:to-blue-900/30 rounded-2xl border border-white/20 dark:border-slate-700/30">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className={`w-4 h-4 rounded-full ${isStreamActive ? 'bg-green-500' : 'bg-red-500'}`}>
-                {isStreamActive && <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-75"></div>}
-              </div>
-            </div>
-            <div>
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                {isStreamActive ? 'LIVE STREAM' : 'STREAM OFFLINE'}
-              </span>
-              <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400">
-                <Video className="w-3 h-3" />
-                <span>1080p • 30fps • HD Quality</span>
-                {isMobile && (
-                  <>
-                    <span>•</span>
-                    <Smartphone className="w-3 h-3" />
-                    <span>Mobile Optimized</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            {!isStreamActive && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={forceRefresh}
-                className="glass-button p-2 rounded-xl hover:scale-105 transition-all duration-300"
-              >
-                <Play className="w-4 h-4 text-green-600" />
-              </Button>
+    <div className="camera-container relative">
+      {/* Stream Status Bar */}
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+        <div className="flex items-center space-x-2">
+          <Badge variant="outline" className={`text-xs font-medium ${
+            isConnected ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'
+          }`}>
+            {isConnected ? (
+              <>
+                <Wifi className="w-3 h-3 mr-1" />
+                Connected
+              </>
+            ) : (
+              <>
+                <WifiOff className="w-3 h-3 mr-1" />
+                Disconnected
+              </>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleFullscreen}
-              className="glass-button p-2 rounded-xl hover:scale-105 transition-all duration-300"
-            >
-              <Maximize className="w-4 h-4 text-blue-600" />
-            </Button>
-          </div>
+          </Badge>
+          
+          {!hasError && !isLoading && (
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs font-medium">
+              1080p • 30fps
+            </Badge>
+          )}
         </div>
 
-        {/* Main Camera Display */}
-        <div className="relative group">
-          <div className="aspect-video bg-gradient-to-br from-slate-900 via-blue-900 to-cyan-900 rounded-3xl overflow-hidden shadow-2xl border-2 border-white/10 dark:border-slate-700/30 relative">
-            {/* Decorative corners */}
-            <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-cyan-400 rounded-tl-lg opacity-60"></div>
-            <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-cyan-400 rounded-tr-lg opacity-60"></div>
-            <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-cyan-400 rounded-bl-lg opacity-60"></div>
-            <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-cyan-400 rounded-br-lg opacity-60"></div>
-            
-            {isConnected ? (
-              <CameraDisplay
-                streamUrl={streamUrl}
-                isConnected={isConnected}
-                imageLoaded={imageLoaded}
-                imageError={imageError}
-                retryCount={retryCount}
-                isMobile={isMobile}
-                imgRef={imgRef}
-                onImageLoad={handleImageLoad}
-                onImageError={handleImageError}
-                className="relative w-full h-full"
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-white/80 p-8">
-                <div className="relative mb-6">
-                  <div className="p-6 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full backdrop-blur-sm border border-red-500/30">
-                    <WifiOff className="w-12 h-12 text-red-400" />
-                  </div>
-                  <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
-                </div>
-                
-                <h3 className="text-xl font-bold mb-2 text-white">Camera Feed Unavailable</h3>
-                <p className="text-sm text-center opacity-75 mb-4 max-w-md">
-                  {lastError && `Connection Error: ${lastError}`}
-                  {!cameraStreamUrl && 'Camera stream URL not configured in settings'}
-                  {cameraStreamUrl && !lastError && 'Attempting to establish connection...'}
-                </p>
-                
-                {cameraStreamUrl && !lastError && (
-                  <div className="flex items-center space-x-2 text-cyan-400 bg-cyan-500/10 px-4 py-2 rounded-full border border-cyan-500/30">
-                    <Zap className="w-4 h-4 animate-pulse" />
-                    <span className="text-sm font-medium">Connecting to stream...</span>
-                  </div>
-                )}
-                
-                <div className="mt-8 grid grid-cols-3 gap-4 text-center opacity-50">
-                  <div className="flex flex-col items-center space-y-1">
-                    <Eye className="w-5 h-5" />
-                    <span className="text-xs">No Signal</span>
-                  </div>
-                  <div className="flex flex-col items-center space-y-1">
-                    <Video className="w-5 h-5" />
-                    <span className="text-xs">Standby</span>
-                  </div>
-                  <div className="flex flex-col items-center space-y-1">
-                    <Camera className="w-5 h-5" />
-                    <span className="text-xs">Offline</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Overlay gradient for better text visibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10 pointer-events-none"></div>
-            
-            {/* Live indicator overlay */}
-            {isStreamActive && (
-              <div className="absolute top-6 left-6 flex items-center space-x-2 bg-red-500/90 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                <span>LIVE</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Professional info panel */}
-          <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-2xl border border-blue-200/30 dark:border-blue-600/30">
-              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">1080p</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Resolution</div>
-            </div>
-            <div className="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-2xl border border-green-200/30 dark:border-green-600/30">
-              <div className="text-lg font-bold text-green-600 dark:text-green-400">30fps</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Frame Rate</div>
-            </div>
-            <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl border border-purple-200/30 dark:border-purple-600/30">
-              <div className="text-lg font-bold text-purple-600 dark:text-purple-400">HD</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Quality</div>
-            </div>
-          </div>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRetry}
+          className="apple-button-secondary p-2 h-auto bg-background/80 backdrop-blur-sm"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </Button>
       </div>
 
-      {/* Fullscreen Overlay */}
-      <CameraFullscreenOverlay
-        isVisible={isFullscreen}
-        streamUrl={streamUrl}
-        isConnected={isConnected}
-        imageLoaded={imageLoaded}
-        imageError={imageError}
-        retryCount={retryCount}
-        isMobile={isMobile}
-        imgRef={imgRef}
-        onImageLoad={handleImageLoad}
-        onImageError={handleImageError}
-        onClose={toggleFullscreen}
-        onForceRefresh={forceRefresh}
-      />
-    </>
+      {/* Loading State */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="apple-card p-4 bg-background/80">
+              <Camera className="w-8 h-8 text-primary animate-pulse" />
+            </div>
+            <div className="text-center">
+              <p className="text-callout font-medium">Connecting to camera...</p>
+              <p className="text-caption text-muted-foreground">Please wait</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center space-y-6 text-center max-w-md mx-auto p-6">
+            <div className="apple-card p-4 bg-destructive/10">
+              <AlertCircle className="w-8 h-8 text-destructive" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-headline font-semibold">Camera Unavailable</h3>
+              <p className="text-body text-muted-foreground">
+                Unable to connect to the camera feed. This could be due to:
+              </p>
+              <ul className="text-caption text-muted-foreground space-y-1 text-left">
+                <li>• Camera service not running</li>
+                <li>• Network connectivity issues</li>
+                <li>• Camera hardware problems</li>
+              </ul>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={handleRetry}
+                className="apple-button-primary"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Retry Connection
+              </Button>
+              <Button 
+                variant="outline"
+                className="apple-button-secondary"
+                onClick={() => window.open('/camera-help', '_blank')}
+              >
+                Get Help
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Camera Stream */}
+             <div className="relative w-full h-full min-h-[300px] bg-gradient-to-br from-muted to-muted/50 rounded-lg overflow-hidden">
+        <img
+          id="camera-stream"
+          src={cameraUrl}
+          alt="Live aquarium camera feed"
+          className="w-full h-full object-cover"
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          style={{ display: hasError ? 'none' : 'block' }}
+        />
+
+        {/* Decorative Corner Elements */}
+        {!hasError && !isLoading && (
+          <>
+            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-primary/30 rounded-tl-lg"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-primary/30 rounded-tr-lg"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-primary/30 rounded-bl-lg"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-primary/30 rounded-br-lg"></div>
+          </>
+        )}
+      </div>
+
+      {/* Recording Indicator */}
+      {!hasError && !isLoading && (
+        <div className="absolute bottom-4 right-4">
+          <div className="flex items-center space-x-2 apple-card bg-background/80 backdrop-blur-sm px-3 py-2">
+            <div className="w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
+            <span className="text-caption font-medium">REC</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
