@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,12 +33,38 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// --- LOCAL DEV BYPASS: Always logged in as mock user ---
+// To restore real auth, remove the following block and restore original logic.
+const BYPASS_AUTH = true;
+const MOCK_USER = {
+  id: 1,
+  username: 'admin',
+  email: 'admin@neptuneos.local',
+  role: 'admin',
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(BYPASS_AUTH ? MOCK_USER : null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const isAuthenticated = !!user;
+
+  // Bypass all auth logic for local dev
+  if (BYPASS_AUTH) {
+    return (
+      <AuthContext.Provider value={{
+        user: MOCK_USER,
+        isLoading: false,
+        isAuthenticated: true,
+        login: async () => true,
+        logout: async () => {},
+        register: async () => true,
+      }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
 
   // Check for existing session on mount
   useEffect(() => {
