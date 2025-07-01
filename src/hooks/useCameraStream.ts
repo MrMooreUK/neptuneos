@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -14,13 +13,21 @@ export const useCameraStream = (streamUrl: string) => {
     setImageLoaded(true);
     setImageError(false);
     setRetryCount(0);
-    console.log("Camera stream loaded successfully");
+    
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Camera stream loaded successfully");
+    }
   };
 
   const handleImageError = () => {
     setImageLoaded(false);
     setImageError(true);
-    console.error("Camera stream error - image failed to load", { retryCount, isMobile });
+    
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Camera stream error - image failed to load", { retryCount, isMobile });
+    }
     
     // Auto-retry on mobile with exponential backoff
     if (isMobile && retryCount < 3) {

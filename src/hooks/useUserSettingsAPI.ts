@@ -1,11 +1,13 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
+// Define proper types for user settings values
+type UserSettingValue = string | number | boolean | object | null;
+
 interface UserSettingsAPI {
-  getAllUserSettings: () => Promise<Record<string, any>>;
-  setUserSetting: (key: string, value: any) => Promise<void>;
+  getAllUserSettings: () => Promise<Record<string, UserSettingValue>>;
+  setUserSetting: (key: string, value: UserSettingValue) => Promise<void>;
 }
 
 const getAuthToken = () => {
@@ -31,7 +33,7 @@ const userSettingsAPI: UserSettingsAPI = {
     return response.json();
   },
 
-  setUserSetting: async (key: string, value: any) => {
+  setUserSetting: async (key: string, value: UserSettingValue) => {
     const token = getAuthToken();
     if (!token) {
       throw new Error('No authentication token found');
@@ -64,7 +66,7 @@ export const useUserSettings = () => {
   });
 
   const setSettingMutation = useMutation({
-    mutationFn: ({ key, value }: { key: string; value: any }) => 
+    mutationFn: ({ key, value }: { key: string; value: UserSettingValue }) => 
       userSettingsAPI.setUserSetting(key, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userSettings'] });

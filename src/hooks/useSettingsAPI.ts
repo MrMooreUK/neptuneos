@@ -1,19 +1,29 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
+// Define proper types for settings values
+type SettingValue = string | number | boolean | object | null;
+
 interface Setting {
   key: string;
-  value: any;
+  value: SettingValue;
+}
+
+interface TemperatureReading {
+  id: number;
+  sensorId: number;
+  temperature: number;
+  unit: string;
+  timestamp: string;
 }
 
 interface SettingsAPI {
-  getAllSettings: () => Promise<Record<string, any>>;
-  getSetting: (key: string) => Promise<any>;
-  setSetting: (key: string, value: any) => Promise<void>;
+  getAllSettings: () => Promise<Record<string, SettingValue>>;
+  getSetting: (key: string) => Promise<SettingValue>;
+  setSetting: (key: string, value: SettingValue) => Promise<void>;
   logTemperature: (sensorId: number, temperature: number, unit: string) => Promise<void>;
-  getTemperatureHistory: (sensorId?: number, limit?: number) => Promise<any[]>;
+  getTemperatureHistory: (sensorId?: number, limit?: number) => Promise<TemperatureReading[]>;
 }
 
 const settingsAPI: SettingsAPI = {
@@ -37,7 +47,7 @@ const settingsAPI: SettingsAPI = {
     return data.value;
   },
 
-  setSetting: async (key: string, value: any) => {
+  setSetting: async (key: string, value: SettingValue) => {
     const response = await fetch(`${API_BASE_URL}/api/settings`, {
       method: 'POST',
       headers: {
@@ -86,7 +96,7 @@ export const useSettings = () => {
   });
 
   const setSettingMutation = useMutation({
-    mutationFn: ({ key, value }: { key: string; value: any }) => 
+    mutationFn: ({ key, value }: { key: string; value: SettingValue }) => 
       settingsAPI.setSetting(key, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });

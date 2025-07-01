@@ -1,4 +1,3 @@
-
 // Security configuration and validation utilities
 export interface SecurityConfig {
   cameraStreamUrl: string;
@@ -31,7 +30,10 @@ export const validateNetworkEndpoint = (url: string): boolean => {
   }
 };
 
-export const logSecurityEvent = (event: string, details?: any) => {
+// Define proper type for security event details
+type SecurityEventDetails = Record<string, unknown> | string | number | boolean | null | undefined;
+
+export const logSecurityEvent = (event: string, details?: SecurityEventDetails) => {
   if (defaultSecurityConfig.enableSecurityLogging) {
     console.log(`[SECURITY] ${new Date().toISOString()}: ${event}`, details);
   }
