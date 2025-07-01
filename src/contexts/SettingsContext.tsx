@@ -1,5 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useTheme } from 'next-themes';
 import { useToast } from '@/hooks/use-toast';
 import { defaultSecurityConfig, validateNetworkEndpoint } from '@/config/security';
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,11 +47,12 @@ interface SettingsProviderProps {
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const { settings, setSetting, isLoading } = useUserSettings();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
 
   // Default values
   const temperatureUnit = settings.temperatureUnit || 'C';
-  const isDarkMode = settings.isDarkMode || false;
+  const isDarkMode = theme === 'dark';
   const fontFamily = settings.fontFamily || 'sans';
   const fontSize = settings.fontSize || 100;
   const layoutDensity = settings.layoutDensity || 'comfortable';
@@ -63,16 +64,28 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   useEffect(() => {
     if (isAuthenticated) {
       const root = document.documentElement;
-      root.classList.toggle('dark', isDarkMode);
+      
+      // Apply font family
       root.classList.remove('font-family-serif', 'font-family-mono');
       if (fontFamily === 'serif') root.classList.add('font-family-serif');
       if (fontFamily === 'mono') root.classList.add('font-family-mono');
+      
+      // Apply font size
       root.style.setProperty('--font-scale', `${fontSize / 100}`);
+      
+      // Apply layout density
       root.classList.remove('density-cozy', 'density-compact');
       if (layoutDensity === 'cozy') root.classList.add('density-cozy');
       if (layoutDensity === 'compact') root.classList.add('density-compact');
     }
-  }, [isAuthenticated, isDarkMode, fontFamily, fontSize, layoutDensity]);
+  }, [isAuthenticated, fontFamily, fontSize, layoutDensity]);
+
+  // Sync theme with user settings
+  useEffect(() => {
+    if (settings.isDarkMode !== undefined && settings.isDarkMode !== isDarkMode) {
+      setTheme(settings.isDarkMode ? 'dark' : 'light');
+    }
+  }, [settings.isDarkMode, isDarkMode, setTheme]);
 
   const setTemperatureUnit = (unit: 'C' | 'F') => {
     setSetting({ key: 'temperatureUnit', value: unit });
@@ -83,6 +96,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const setIsDarkMode = (isDark: boolean) => {
+    setTheme(isDark ? 'dark' : 'light');
     setSetting({ key: 'isDarkMode', value: isDark });
     toast({
       title: "Theme Updated",
@@ -170,6 +184,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     Object.entries(defaultSettings).forEach(([key, value]) => {
       setSetting({ key, value });
     });
+    
+    setTheme('light');
     
     toast({
       title: "Factory Reset Complete",
