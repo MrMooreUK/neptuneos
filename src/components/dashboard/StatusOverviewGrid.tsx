@@ -12,9 +12,9 @@ const StatusOverviewGrid = ({ avgTemp, lastUpdated }: StatusOverviewGridProps) =
   const avgTempStatus = getTemperatureStatus(avgTemp);
 
   const getTemperatureColor = () => {
-    if (avgTempStatus.color.includes('green')) return 'text-success';
-    if (avgTempStatus.color.includes('red')) return 'text-destructive';
-    return 'text-primary';
+    if (avgTempStatus.color.includes('green')) return 'text-green-600';
+    if (avgTempStatus.color.includes('red')) return 'text-red-600';
+    return 'text-blue-600';
   };
 
   const statusCards = [
@@ -22,87 +22,74 @@ const StatusOverviewGrid = ({ avgTemp, lastUpdated }: StatusOverviewGridProps) =
       icon: Wifi,
       label: 'System Status',
       value: 'Online',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
+      color: 'text-green-600',
+      iconColor: 'text-green-600'
     },
     {
       icon: Thermometer,
       label: 'Water Temperature',
       value: `${convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°${temperatureUnit}`,
       color: getTemperatureColor(),
-      bgColor: avgTempStatus.color.includes('green') ? 'bg-success/10' : 
-               avgTempStatus.color.includes('red') ? 'bg-destructive/10' : 'bg-primary/10',
       iconColor: getTemperatureColor()
     },
     {
       icon: Droplets,
       label: 'Water Quality',
       value: 'Optimal',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-      iconColor: 'text-primary'
+      color: 'text-blue-600',
+      iconColor: 'text-blue-600'
     },
     {
       icon: Heart,
       label: 'Fish Health',
       value: 'Excellent',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
+      color: 'text-green-600',
+      iconColor: 'text-green-600'
     },
     {
       icon: Zap,
       label: 'Power Status',
       value: 'Stable',
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
-      iconColor: 'text-warning'
+      color: 'text-yellow-600',
+      iconColor: 'text-yellow-600'
     },
     {
       icon: Shield,
       label: 'Security',
       value: 'Protected',
-      color: 'text-accent',
-      bgColor: 'bg-accent/10',
-      iconColor: 'text-accent'
+      color: 'text-purple-600',
+      iconColor: 'text-purple-600'
     },
     {
       icon: RefreshCw,
       label: 'Last Updated',
       value: lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted',
-      iconColor: 'text-muted-foreground'
+      color: 'text-gray-600',
+      iconColor: 'text-gray-600'
     },
     {
       icon: Activity,
       label: 'Active Sensors',
       value: '8/8',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
+      color: 'text-green-600',
+      iconColor: 'text-green-600'
     }
   ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
       {statusCards.map((card, index) => (
-        <div
-          key={index}
-          className="metric-card group hover:scale-105 transition-all duration-300"
-        >
-          <div className={`apple-card p-3 ${card.bgColor} mb-3 w-fit mx-auto`}>
-            <card.icon className={`w-5 h-5 ${card.iconColor}`} />
+        <div key={index} className="metric-card text-center">
+          <div className="flex justify-center mb-3">
+            <card.icon className={`w-6 h-6 ${card.iconColor}`} />
           </div>
           
-          <div className="space-y-1">
-            <div className={`metric-value ${card.color}`}>
-              {card.value}
-            </div>
-            <div className="metric-label">
-              {card.label}
-            </div>
+          <div className={`text-2xl font-bold ${card.color} mb-1`}>
+            {card.value}
+          </div>
+          
+          <div className="text-sm text-muted-foreground">
+            {card.label}
           </div>
         </div>
       ))}
