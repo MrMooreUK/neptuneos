@@ -194,7 +194,7 @@
   }
 
   .professional-card {
-    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-slate-700/50 transition-all duration-500 hover:shadow-3xl hover:scale-[1.02];
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-slate-700/50 transition-all duration-500 hover:shadow-2xl hover:scale-[1.02];
   }
 
   .status-indicator {
