@@ -86,17 +86,23 @@ const StatusOverviewGrid = ({ avgTemp, lastUpdated }: StatusOverviewGridProps) =
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6">
       {statusCards.map((card, index) => (
         <div
           key={index}
-          className="metric-card group hover:scale-105 transition-all duration-300"
+          className={`status-card ${
+            card.iconColor.includes('success') ? 'status-card-success' :
+            card.iconColor.includes('warning') ? 'status-card-warning' :
+            card.iconColor.includes('accent') ? 'status-card-accent' :
+            'status-card-primary'
+          } group hover:scale-105 transition-all duration-300`}
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
-          <div className={`apple-card p-3 ${card.bgColor} mb-3 w-fit mx-auto`}>
+          <div className="icon-container mb-4 w-fit mx-auto">
             <card.icon className={`w-5 h-5 ${card.iconColor}`} />
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className={`metric-value ${card.color}`}>
               {card.value}
             </div>

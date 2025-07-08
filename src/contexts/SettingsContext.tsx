@@ -50,15 +50,15 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
 
-  // Default values
-  const temperatureUnit = settings.temperatureUnit || 'C';
+  // Default values with proper type casting
+  const temperatureUnit = (settings.temperatureUnit as 'C' | 'F') || 'C';
   const isDarkMode = theme === 'dark';
-  const fontFamily = settings.fontFamily || 'sans';
-  const fontSize = settings.fontSize || 100;
-  const layoutDensity = settings.layoutDensity || 'comfortable';
-  const refreshInterval = settings.refreshInterval || 10;
-  const autoRefresh = settings.autoRefresh !== undefined ? settings.autoRefresh : true;
-  const cameraStreamUrl = settings.cameraStreamUrl || defaultSecurityConfig.cameraStreamUrl;
+  const fontFamily = (settings.fontFamily as FontFamily) || 'sans';
+  const fontSize = Number(settings.fontSize) || 100;
+  const layoutDensity = (settings.layoutDensity as LayoutDensity) || 'comfortable';
+  const refreshInterval = Number(settings.refreshInterval) || 10;
+  const autoRefresh = Boolean(settings.autoRefresh !== undefined ? settings.autoRefresh : true);
+  const cameraStreamUrl = String(settings.cameraStreamUrl) || defaultSecurityConfig.cameraStreamUrl;
 
   // Apply settings to DOM
   useEffect(() => {

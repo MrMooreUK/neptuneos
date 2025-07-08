@@ -31,9 +31,9 @@ const Index = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="hero-section fade-in">
-          <div className="flex items-center justify-center mb-6">
-            <div className="apple-card-elevated p-6 bg-gradient-to-br from-primary/10 to-accent/10">
-              <Waves className="w-16 h-16 text-primary" />
+          <div className="flex items-center justify-center mb-8">
+            <div className="icon-container floating-card">
+              <Waves className="w-16 h-16 text-primary" style={{ animation: 'wave 4s ease-in-out infinite' }} />
             </div>
           </div>
           <h1 className="hero-title">
@@ -45,11 +45,10 @@ const Index = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="space-y-12 pb-12">
+        <div className="space-y-16 pb-16">
           {/* System Overview */}
           <section className="slide-up">
             <div className="section-header">
-              <div className="w-1 h-8 bg-primary rounded-full mr-4"></div>
               System Overview
             </div>
             <StatusOverviewGrid avgTemp={avgTemp} lastUpdated={lastUpdated} />
@@ -59,10 +58,10 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Temperature Monitoring */}
             <div className="lg:col-span-1 scale-in">
-              <div className="apple-card-elevated">
-                <div className="p-6 border-b border-border/50">
+              <div className="premium-card">
+                <div className="p-6 border-b border-border/30">
                   <div className="flex items-center">
-                    <div className="apple-card p-3 bg-gradient-to-br from-warning/10 to-destructive/10 mr-4">
+                    <div className="icon-container mr-4">
                       <Thermometer className="w-6 h-6 text-warning" />
                     </div>
                     <div>
@@ -79,11 +78,11 @@ const Index = () => {
 
             {/* Camera Feed */}
             <div className="lg:col-span-2 scale-in">
-              <div className="apple-card-elevated">
-                <div className="p-6 border-b border-border/50">
+              <div className="premium-card">
+                <div className="p-6 border-b border-border/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="apple-card p-3 bg-gradient-to-br from-accent/10 to-primary/10 mr-4">
+                      <div className="icon-container mr-4">
                         <Camera className="w-6 h-6 text-accent" />
                       </div>
                       <div>
@@ -106,7 +105,6 @@ const Index = () => {
           {/* Future Features */}
           <section className="slide-up">
             <div className="section-header">
-              <div className="w-1 h-8 bg-accent rounded-full mr-4"></div>
               Coming Soon
             </div>
             <ComingSoonSection />

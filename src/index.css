@@ -8,45 +8,68 @@
 
 @layer base {
   :root {
-    /* Apple-inspired Color System */
-    --background: 255 255 255;
-    --foreground: 28 28 30;
-    --secondary-background: 247 247 247;
-    --tertiary-background: 242 242 247;
+    /* Aquarium-Inspired Premium Color System */
+    --background: 248 250 252;
+    --foreground: 15 23 42;
+    --secondary-background: 241 245 249;
+    --tertiary-background: 236 242 247;
 
     --card: 255 255 255;
-    --card-foreground: 28 28 30;
+    --card-foreground: 15 23 42;
 
-    --primary: 0 122 255;
+    /* Ocean Blue Palette */
+    --primary: 6 95 181;
+    --primary-light: 59 130 246;
+    --primary-dark: 29 78 216;
     --primary-foreground: 255 255 255;
 
-    --secondary: 142 142 147;
-    --secondary-foreground: 28 28 30;
-
-    --muted: 242 242 247;
-    --muted-foreground: 142 142 147;
-
-    --accent: 88 86 214;
+    /* Aqua & Teal Accents */
+    --accent: 6 182 212;
+    --accent-light: 34 211 238;
+    --accent-dark: 8 145 178;
     --accent-foreground: 255 255 255;
 
-    --destructive: 255 59 48;
-    --destructive-foreground: 255 255 255;
+    /* Coral & Warm Highlights */
+    --coral: 251 113 133;
+    --coral-light: 252 165 165;
+    --coral-dark: 244 63 94;
 
-    --success: 52 199 89;
+    /* Status Colors */
+    --success: 34 197 94;
+    --success-light: 74 222 128;
+    --success-dark: 22 163 74;
     --success-foreground: 255 255 255;
 
-    --warning: 255 149 0;
+    --warning: 245 158 11;
+    --warning-light: 251 191 36;
+    --warning-dark: 217 119 6;
     --warning-foreground: 255 255 255;
 
-    --border: 209 209 214;
-    --input: 209 209 214;
-    --ring: 0 122 255;
+    --destructive: 239 68 68;
+    --destructive-light: 248 113 113;
+    --destructive-dark: 220 38 38;
+    --destructive-foreground: 255 255 255;
 
-    /* Apple Typography Scale */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Neutral Grays */
+    --secondary: 100 116 139;
+    --secondary-foreground: 15 23 42;
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 6 95 181;
+
+    /* Premium Gradients */
+    --gradient-ocean: linear-gradient(135deg, hsl(197 71% 52%) 0%, hsl(221 83% 53%) 50%, hsl(262 83% 58%) 100%);
+    --gradient-coral: linear-gradient(135deg, hsl(351 83% 74%) 0%, hsl(14 91% 60%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(158 64% 52%) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    
+    /* Typography */
+    --font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-scale: 1.0;
 
-    /* Apple Spacing System */
+    /* Spacing Scale */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
@@ -54,64 +77,82 @@
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
 
-    /* Apple Radius System */
-    --radius-sm: 0.375rem;
+    /* Radius Scale */
+    --radius-sm: 0.5rem;
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1.5rem;
 
-    /* Apple Shadows */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
-    /* Aquarium-specific Colors */
-    --aqua-blue: 0 122 255;
-    --ocean-teal: 90 200 250;
-    --deep-blue: 30 64 175;
-    --coral: 255 99 71;
+    /* Premium Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(6, 95, 181, 0.1), 0 1px 2px 0 rgba(6, 95, 181, 0.06);
+    --shadow-md: 0 4px 12px -2px rgba(6, 95, 181, 0.12), 0 2px 8px -2px rgba(6, 95, 181, 0.08);
+    --shadow-lg: 0 8px 32px -4px rgba(6, 95, 181, 0.15), 0 4px 16px -4px rgba(6, 95, 181, 0.10);
+    --shadow-xl: 0 16px 48px -8px rgba(6, 95, 181, 0.20), 0 8px 24px -8px rgba(6, 95, 181, 0.15);
+    --shadow-2xl: 0 24px 64px -12px rgba(6, 95, 181, 0.25), 0 12px 32px -12px rgba(6, 95, 181, 0.20);
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --backdrop-blur: 12px;
   }
 
   .dark {
-    --background: 0 0 0;
-    --foreground: 255 255 255;
-    --secondary-background: 28 28 30;
-    --tertiary-background: 44 44 46;
+    /* Dark Ocean Theme */
+    --background: 3 7 18;
+    --foreground: 248 250 252;
+    --secondary-background: 15 23 42;
+    --tertiary-background: 30 41 59;
 
-    --card: 28 28 30;
-    --card-foreground: 255 255 255;
+    --card: 15 23 42;
+    --card-foreground: 248 250 252;
 
-    --primary: 10 132 255;
+    /* Enhanced Dark Ocean Colors */
+    --primary: 59 130 246;
+    --primary-light: 96 165 250;
+    --primary-dark: 37 99 235;
     --primary-foreground: 255 255 255;
 
-    --secondary: 142 142 147;
-    --secondary-foreground: 255 255 255;
-
-    --muted: 44 44 46;
-    --muted-foreground: 142 142 147;
-
-    --accent: 94 92 230;
+    --accent: 34 211 238;
+    --accent-light: 103 232 249;
+    --accent-dark: 6 182 212;
     --accent-foreground: 255 255 255;
 
-    --destructive: 255 69 58;
-    --destructive-foreground: 255 255 255;
-
-    --success: 48 209 88;
+    /* Dark Mode Status Colors */
+    --success: 74 222 128;
+    --success-light: 134 239 172;
+    --success-dark: 34 197 94;
     --success-foreground: 255 255 255;
 
-    --warning: 255 159 10;
+    --warning: 251 191 36;
+    --warning-light: 254 240 138;
+    --warning-dark: 245 158 11;
     --warning-foreground: 255 255 255;
 
-    --border: 58 58 60;
-    --input: 58 58 60;
-    --ring: 10 132 255;
+    --destructive: 248 113 113;
+    --destructive-light: 252 165 165;
+    --destructive-dark: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    /* Dark mode shadows */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    /* Dark Neutrals */
+    --secondary: 148 163 184;
+    --secondary-foreground: 248 250 252;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 59 130 246;
+
+    /* Enhanced Dark Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 32px -4px rgba(0, 0, 0, 0.6), 0 4px 16px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 16px 48px -8px rgba(0, 0, 0, 0.7), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 24px 64px -12px rgba(0, 0, 0, 0.8), 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+
+    /* Dark Glassmorphism */
+    --glass-bg: rgba(15, 23, 42, 0.3);
+    --glass-border: rgba(148, 163, 184, 0.2);
   }
 }
 
@@ -194,167 +235,250 @@
 
 /* Apple-Inspired Components */
 @layer components {
-  .apple-card {
-    @apply bg-card rounded-xl border border-border;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Premium Component Styles */
+@layer components {
+  /* Glassmorphism Cards */
+  .glass-card {
+    @apply bg-white/10 dark:bg-slate-900/30 backdrop-blur-xl border border-white/20 dark:border-slate-600/30 rounded-2xl;
+    box-shadow: 
+      0 8px 32px rgba(6, 95, 181, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .apple-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+  .glass-card:hover {
+    @apply bg-white/15 dark:bg-slate-900/40;
+    box-shadow: 
+      0 16px 48px rgba(6, 95, 181, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-4px) scale(1.02);
   }
 
-  .apple-card-elevated {
-    @apply bg-card rounded-xl border-0;
-    box-shadow: var(--shadow-lg);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Premium Cards */
+  .premium-card {
+    @apply bg-gradient-to-br from-white/95 to-white/85 dark:from-slate-800/95 dark:to-slate-900/85 backdrop-blur-xl rounded-2xl border border-primary/10 dark:border-primary/20;
+    box-shadow: 
+      0 12px 40px rgba(6, 95, 181, 0.15),
+      0 4px 16px rgba(6, 95, 181, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .apple-card-elevated:hover {
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-2px);
+  .premium-card:hover {
+    box-shadow: 
+      0 20px 60px rgba(6, 95, 181, 0.25),
+      0 8px 24px rgba(6, 95, 181, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-6px);
   }
 
-  .apple-button {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-    font-weight: 590;
-    letter-spacing: -0.01em;
+  /* Floating Cards */
+  .floating-card {
+    @apply premium-card relative overflow-hidden;
+    animation: float 6s ease-in-out infinite;
   }
 
-  .apple-button-primary {
-    @apply apple-button bg-primary text-primary-foreground;
-    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
-  }
-
-  .apple-button-primary:hover {
-    @apply bg-primary/90;
-    transform: translateY(-0.5px);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-  }
-
-  .apple-button-secondary {
-    @apply apple-button bg-muted text-foreground border border-border;
-  }
-
-  .apple-button-secondary:hover {
-    @apply bg-muted/80;
-    transform: translateY(-0.5px);
-  }
-
-  .apple-input {
-    @apply w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm transition-all duration-200;
-    font-weight: 400;
-  }
-
-  .apple-input:focus {
-    @apply outline-none ring-2 ring-ring border-transparent;
-  }
-
-  .apple-switch {
-    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200;
-    background-color: hsl(var(--muted));
-  }
-
-  .apple-switch[data-state="checked"] {
-    background-color: hsl(var(--success));
-  }
-
-  .apple-switch-thumb {
-    @apply block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200;
-    transform: translateX(1px);
-  }
-
-  .apple-switch[data-state="checked"] .apple-switch-thumb {
-    transform: translateX(22px);
-  }
-
-  .status-dot {
-    @apply relative inline-flex h-3 w-3 rounded-full;
-  }
-
-  .status-dot::before {
-    @apply absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping;
+  .floating-card::before {
     content: '';
-    background: inherit;
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent;
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite;
   }
 
-  .status-dot-green {
-    @apply status-dot bg-green-500;
+  /* Status Cards */
+  .status-card {
+    @apply premium-card p-6 text-center min-h-[140px] flex flex-col justify-between;
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--card))/0.8 100%
+    );
   }
 
-  .status-dot-blue {
-    @apply status-dot bg-blue-500;
+  .status-card-success {
+    @apply border-success/30 dark:border-success/40;
+    background: linear-gradient(135deg, 
+      hsl(var(--success))/0.05 0%, 
+      hsl(var(--success))/0.1 100%
+    );
   }
 
-  .status-dot-orange {
-    @apply status-dot bg-orange-500;
+  .status-card-primary {
+    @apply border-primary/30 dark:border-primary/40;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary))/0.05 0%, 
+      hsl(var(--primary))/0.1 100%
+    );
   }
 
-  .status-dot-red {
-    @apply status-dot bg-red-500;
+  .status-card-warning {
+    @apply border-warning/30 dark:border-warning/40;
+    background: linear-gradient(135deg, 
+      hsl(var(--warning))/0.05 0%, 
+      hsl(var(--warning))/0.1 100%
+    );
   }
 
-  .metric-card {
-    @apply apple-card p-6 text-center space-y-3;
-    min-height: 120px;
+  .status-card-accent {
+    @apply border-accent/30 dark:border-accent/40;
+    background: linear-gradient(135deg, 
+      hsl(var(--accent))/0.05 0%, 
+      hsl(var(--accent))/0.1 100%
+    );
   }
 
-  .metric-value {
-    @apply text-title-1 font-bold;
-    font-variant-numeric: tabular-nums;
+  /* Icon Containers */
+  .icon-container {
+    @apply p-4 rounded-2xl flex items-center justify-center relative overflow-hidden;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary))/0.1 0%, 
+      hsl(var(--accent))/0.1 100%
+    );
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 2px 8px rgba(6, 95, 181, 0.1);
   }
 
-  .metric-label {
-    @apply text-caption text-muted-foreground;
-    font-weight: 500;
+  .icon-container::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0;
+    transition: opacity 0.3s ease;
   }
 
-  .section-header {
-    @apply text-title-2 font-semibold mb-6 flex items-center;
-    color: hsl(var(--foreground));
+  .icon-container:hover::before {
+    @apply opacity-100;
+    animation: shimmer 1.5s ease;
   }
 
+  /* Navigation Bar */
+  .nav-bar {
+    @apply sticky top-0 z-50 w-full backdrop-blur-xl border-b border-border/40;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(255, 255, 255, 0.8) 100%
+    );
+  }
+
+  .dark .nav-bar {
+    background: linear-gradient(135deg, 
+      rgba(3, 7, 18, 0.9) 0%, 
+      rgba(15, 23, 42, 0.8) 100%
+    );
+  }
+
+  /* Hero Section */
   .hero-section {
-    @apply text-center py-12 px-4;
+    @apply relative text-center py-16 px-4 overflow-hidden;
+  }
+
+  .hero-section::before {
+    content: '';
+    @apply absolute inset-0 opacity-30;
+    background: radial-gradient(ellipse at top, hsl(var(--primary))/0.15, transparent 50%),
+                radial-gradient(ellipse at bottom, hsl(var(--accent))/0.1, transparent 50%);
   }
 
   .hero-title {
-    @apply text-5xl md:text-6xl font-bold tracking-tight mb-4;
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    @apply relative text-6xl md:text-7xl font-bold tracking-tight mb-6;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 50%,
+      hsl(var(--primary)) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease-in-out infinite;
+  }
+
+  .hero-subtitle {
+    @apply relative text-xl text-muted-foreground max-w-2xl mx-auto font-light;
+  }
+
+  /* Camera Container */
+  .camera-container {
+    @apply relative overflow-hidden rounded-2xl;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, 
+      hsl(var(--muted)) 0%, 
+      hsl(var(--muted))/0.5 100%
+    );
+    box-shadow: 
+      0 12px 40px rgba(6, 95, 181, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Live Indicator */
+  .live-indicator {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-600 border border-red-500/20 backdrop-blur-sm;
+  }
+
+  .live-indicator::before {
+    @apply w-2 h-2 bg-red-500 rounded-full mr-2;
+    content: '';
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  /* Metric Values */
+  .metric-value {
+    @apply text-3xl font-bold mb-2;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, 
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--foreground))/0.8 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .hero-subtitle {
-    @apply text-xl text-muted-foreground max-w-2xl mx-auto;
-    font-weight: 400;
+  .metric-label {
+    @apply text-sm text-muted-foreground font-medium;
   }
 
-  .navigation-bar {
-    @apply sticky top-0 z-50 w-full border-b border-border/40 backdrop-blur-xl;
-    background: rgba(255, 255, 255, 0.8);
+  /* Section Headers */
+  .section-header {
+    @apply text-2xl font-bold mb-8 flex items-center relative;
+    color: hsl(var(--foreground));
   }
 
-  .dark .navigation-bar {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  .camera-container {
-    @apply apple-card-elevated overflow-hidden;
-    aspect-ratio: 16/9;
-    background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted))/0.5);
-  }
-
-  .live-indicator {
-    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-600 border border-red-500/20;
-  }
-
-  .live-indicator::before {
-    @apply w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse;
+  .section-header::before {
     content: '';
+    @apply w-1 h-8 rounded-full mr-4;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 100%
+    );
   }
+
+  /* Button Enhancements */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-300;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--primary-dark)) 100%
+    );
+    box-shadow: 
+      0 4px 16px rgba(6, 95, 181, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 8px 32px rgba(6, 95, 181, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 bg-white/80 dark:bg-slate-800/80 border border-border/50 backdrop-blur-sm;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-white/90 dark:bg-slate-800/90;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(6, 95, 181, 0.1);
+  }
+}
 
   /* Smooth Animations */
   .fade-in {
@@ -370,7 +494,7 @@
   }
 }
 
-/* Apple-Inspired Animations */
+/* Premium Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -395,6 +519,56 @@
   to { 
     opacity: 1; 
     transform: scale(1); 
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    transform: translateX(-100%); 
+  }
+  100% { 
+    transform: translateX(100%); 
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
   }
 }
 
