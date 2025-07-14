@@ -22,91 +22,40 @@ const StatusOverviewGrid = ({ avgTemp, lastUpdated }: StatusOverviewGridProps) =
       icon: Wifi,
       label: 'System Status',
       value: 'Online',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
+      color: 'text-success'
     },
     {
       icon: Thermometer,
-      label: 'Water Temperature',
+      label: 'Temperature',
       value: `${convertTemperature(avgTemp, temperatureUnit).toFixed(1)}°${temperatureUnit}`,
-      color: getTemperatureColor(),
-      bgColor: avgTempStatus.color.includes('green') ? 'bg-success/10' : 
-               avgTempStatus.color.includes('red') ? 'bg-destructive/10' : 'bg-primary/10',
-      iconColor: getTemperatureColor()
+      color: getTemperatureColor()
     },
     {
-      icon: Droplets,
-      label: 'Water Quality',
-      value: 'Optimal',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-      iconColor: 'text-primary'
-    },
-    {
-      icon: Heart,
-      label: 'Fish Health',
-      value: 'Excellent',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
-    },
-    {
-      icon: Zap,
-      label: 'Power Status',
-      value: 'Stable',
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
-      iconColor: 'text-warning'
-    },
-    {
-      icon: Shield,
-      label: 'Security',
-      value: 'Protected',
-      color: 'text-accent',
-      bgColor: 'bg-accent/10',
-      iconColor: 'text-accent'
+      icon: Activity,
+      label: 'Sensors Active',
+      value: '2/2',
+      color: 'text-success'
     },
     {
       icon: RefreshCw,
       label: 'Last Updated',
       value: lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted',
-      iconColor: 'text-muted-foreground'
-    },
-    {
-      icon: Activity,
-      label: 'Active Sensors',
-      value: '8/8',
-      color: 'text-success',
-      bgColor: 'bg-success/10',
-      iconColor: 'text-success'
+      color: 'text-muted-foreground'
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
       {statusCards.map((card, index) => (
-        <div
-          key={index}
-          className={`status-card ${
-            card.iconColor.includes('success') ? 'status-card-success' :
-            card.iconColor.includes('warning') ? 'status-card-warning' :
-            card.iconColor.includes('accent') ? 'status-card-accent' :
-            'status-card-primary'
-          } group hover:scale-105 transition-all duration-300`}
-          style={{ animationDelay: `${index * 0.1}s` }}
-        >
-          <div className="icon-container mb-4 w-fit mx-auto">
-            <card.icon className={`w-5 h-5 ${card.iconColor}`} />
+        <div key={index} className="glass-card p-4 text-center">
+          <div className="flex items-center justify-center mb-3">
+            <card.icon className={`w-5 h-5 ${card.color}`} />
           </div>
-          
-          <div className="space-y-2">
-            <div className={`metric-value ${card.color}`}>
+          <div className="space-y-1">
+            <div className={`text-lg font-semibold ${card.color}`}>
               {card.value}
             </div>
-            <div className="metric-label">
+            <div className="text-sm text-muted-foreground">
               {card.label}
             </div>
           </div>
